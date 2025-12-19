@@ -82,6 +82,8 @@ class UniformApplication(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     parent_id = db.Column(db.Integer, db.ForeignKey('parents.id'), nullable=False)
     school_id = db.Column(db.Integer, db.ForeignKey('schools.id'), nullable=False)
+    student_name = db.Column(db.String(255))
+    student_class = db.Column(db.String(50))
     uniform_type = db.Column(db.String(50))  # primary, junior, secondary
     shirt_size = db.Column(db.String(10))
     trouser_size = db.Column(db.String(10))
