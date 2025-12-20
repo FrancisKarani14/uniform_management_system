@@ -27,8 +27,8 @@ class addSchool(Resource):
         data = request.get_json()
         school = School(
             name=data['name'],
-            email=data['email'],
-            password=data['password'],
+            # email=data['email'],
+            # password=data['password'],
             location=data['location'],
             phone_number=data['phone_number'],
             uniform_types=data['uniform_types']
@@ -39,6 +39,7 @@ class addSchool(Resource):
     
 api.add_resource(addSchool, '/schools')
 
+# get alll schools
 
 
 if __name__ == '__main__':
