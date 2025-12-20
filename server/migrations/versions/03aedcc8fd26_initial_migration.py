@@ -1,8 +1,8 @@
 """initial migration
 
-Revision ID: 3c0df418c476
+Revision ID: 03aedcc8fd26
 Revises: 
-Create Date: 2025-12-20 11:16:22.270992
+Create Date: 2025-12-20 16:55:10.117106
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3c0df418c476'
+revision = '03aedcc8fd26'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,7 +22,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('location', sa.String(length=255), nullable=True),
-    sa.Column('phone_number', sa.String(length=255), nullable=True),
+    sa.Column('phone_number', sa.String(length=50), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
@@ -30,7 +30,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sa.String(length=255), nullable=False),
     sa.Column('password_hash', sa.String(length=255), nullable=False),
-    sa.Column('role', sa.String(length=50), nullable=False),
+    sa.Column('role', sa.Enum('super_admin', 'school_admin', 'parent', 'tailor', name='user_roles'), nullable=False),
     sa.Column('is_approved', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
@@ -40,7 +40,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('type', sa.String(length=50), nullable=True),
-    sa.Column('message', sa.Text(), nullable=True),
+    sa.Column('message', sa.Text(), nullable=False),
     sa.Column('is_read', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
@@ -69,36 +69,41 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('business_name', sa.String(length=255), nullable=True),
     sa.Column('location', sa.String(length=255), nullable=True),
+    sa.Column('phone_number', sa.String(length=50), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('tailor_school_requests',
+    op.create_table('tailor_schools',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('tailor_id', sa.Integer(), nullable=False),
     sa.Column('school_id', sa.Integer(), nullable=False),
-    sa.Column('status', sa.String(length=50), nullable=True),
+    sa.Column('status', sa.Enum('pending', 'approved', 'rejected', name='tailor_school_status'), nullable=False),
     sa.Column('approved_by', sa.Integer(), nullable=True),
+    sa.Column('approved_at', sa.DateTime(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['approved_by'], ['users.id'], ),
     sa.ForeignKeyConstraint(['school_id'], ['schools.id'], ),
     sa.ForeignKeyConstraint(['tailor_id'], ['tailors.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('tailor_id', 'school_id', name='uq_tailor_school')
     )
     op.create_table('uniform_applications',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('parent_id', sa.Integer(), nullable=False),
     sa.Column('school_id', sa.Integer(), nullable=False),
-    sa.Column('student_name', sa.String(length=255), nullable=True),
+    sa.Column('student_name', sa.String(length=255), nullable=False),
     sa.Column('student_class', sa.String(length=50), nullable=True),
-    sa.Column('uniform_type', sa.String(length=50), nullable=True),
+    sa.Column('uniform_type', sa.Enum('primary', 'junior', 'secondary', name='uniform_types'), nullable=False),
     sa.Column('shirt_size', sa.String(length=10), nullable=True),
     sa.Column('trouser_size', sa.String(length=10), nullable=True),
     sa.Column('skirt_size', sa.String(length=10), nullable=True),
     sa.Column('shoe_size', sa.String(length=10), nullable=True),
     sa.Column('additional_notes', sa.Text(), nullable=True),
-    sa.Column('status', sa.String(length=50), nullable=True),
+    sa.Column('status', sa.Enum('pending', 'approved', 'rejected', name='uniform_application_status'), nullable=False),
     sa.Column('approved_by', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['approved_by'], ['users.id'], ),
     sa.ForeignKeyConstraint(['parent_id'], ['parents.id'], ),
     sa.ForeignKeyConstraint(['school_id'], ['schools.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -109,6 +114,7 @@ def upgrade():
     sa.Column('tailor_id', sa.Integer(), nullable=False),
     sa.Column('assigned_by', sa.Integer(), nullable=True),
     sa.Column('assigned_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['assigned_by'], ['users.id'], ),
     sa.ForeignKeyConstraint(['tailor_id'], ['tailors.id'], ),
     sa.ForeignKeyConstraint(['uniform_application_id'], ['uniform_applications.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -120,7 +126,7 @@ def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('uniform_assignments')
     op.drop_table('uniform_applications')
-    op.drop_table('tailor_school_requests')
+    op.drop_table('tailor_schools')
     op.drop_table('tailors')
     op.drop_table('school_admins')
     op.drop_table('parents')
