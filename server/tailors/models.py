@@ -12,6 +12,7 @@ class Tailor_school_request(models.Model):
     tailor = models.ForeignKey('users.TailorProfile', on_delete=models.CASCADE, related_name='tailorschoolrequest')
     school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='tailorschoolrequest')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
+    applied_at = models.DateTimeField(auto_now_add=True)
 
     # one application per tailor per school
     class Meta:
