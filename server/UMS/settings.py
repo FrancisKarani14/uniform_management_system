@@ -40,9 +40,14 @@ INSTALLED_APPS = [
     
     'rest_framework',
     'corsheaders',
-    # 'rest_framework.authtoken',
-    # 'rest_auth',
+    'users',
+    'tailors',
+    'uniform_orders',
+    'schools'
 ]
+
+AUTH_USER_MODEL = 'users.User'
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -122,3 +127,4 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 CORS_ALLOW_ALL_ORIGINS = True
+
