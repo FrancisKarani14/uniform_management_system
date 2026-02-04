@@ -16,7 +16,7 @@ class User(AbstractUser):
 class AdminProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='admin_profile')
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    # avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
 
 
     def __str__(self):
@@ -35,7 +35,7 @@ class TailorProfile(models.Model):
 
 class SchoolAdminProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='school_admin_profile')
-    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='admins')
+    # school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='admins')
     phone_number = models.CharField(max_length=15)
 
     def __str__(self):

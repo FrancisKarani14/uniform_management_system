@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     'schools'
 ]
 
+AUTH_USER_MODEL = 'users.User'
+
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -124,3 +127,4 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 CORS_ALLOW_ALL_ORIGINS = True
+
