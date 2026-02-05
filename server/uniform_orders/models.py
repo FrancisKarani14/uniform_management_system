@@ -29,5 +29,14 @@ class Uniform_order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
  
 
+#  uniform assignments
+class Uniform_assignment(models.Model):
+    uniform_order = models.ForeignKey(Uniform_order, on_delete=models.CASCADE, related_name='uniform_assignment')
+    tailor = models.ForeignKey('users.TailorProfile', on_delete=models.CASCADE, related_name='uniform_assignment')
+    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='uniform_assignment')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
 
     
