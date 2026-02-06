@@ -52,12 +52,18 @@ class ParentProfile(models.Model):
         return f"Parent: {self.user.username}"
     
 class StudentProfile(models.Model):
+    class Gender(models.TextChoices):
+        MALE = 'Male'
+        FEMALE = 'Female'
+        OTHER = 'Other'
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
     parent = models.ForeignKey(ParentProfile, on_delete=models.CASCADE, related_name='children')
     school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='students')
     admission_number = models.CharField(max_length=50, unique=True)
     date_of_birth = models.DateField()
-    gender = models.CharField(max_length=10)
+    gender = models.CharField(max_length=10, choices=Gender.choices)
+    
 
     def __str__(self):
         return f"Student: {self.user.username}"

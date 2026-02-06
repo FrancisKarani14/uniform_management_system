@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import User, AdminProfile, TailorProfile, SchoolAdminProfile, ParentProfile
+from .models import User, AdminProfile, TailorProfile, SchoolAdminProfile, ParentProfile, StudentProfile
+
 
 # serialize user model
 class UserSerializer(serializers.ModelSerializer):
@@ -30,4 +31,10 @@ class ParentProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = ParentProfile
         fields = ["phone_number", "address"]
+
+# serialize StudentProfile
+class StudentProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentProfile
+        fields = ["admission_number", "date_of_birth", "gender"]
 
