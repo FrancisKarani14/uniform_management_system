@@ -9,6 +9,7 @@ class User(AbstractUser):
         TAILOR =  'Tailor'
         SCHOOL_ADMIN =  'School_Admin'
         PARENT =  'Parent'
+        STUDENT = 'Student'
     role = models.CharField(max_length=20, choices=Roles.choices)
 
 
@@ -49,3 +50,14 @@ class ParentProfile(models.Model):
 
     def __str__(self):
         return f"Parent: {self.user.username}"
+    
+class StudentProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
+    parent = models.ForeignKey(ParentProfile, on_delete=models.CASCADE, related_name='children')
+    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='students')
+    admission_number = models.CharField(max_length=50, unique=True)
+    date_of_birth = models.DateField()
+    gender = models.CharField(max_length=10)
+
+    def __str__(self):
+        return f"Student: {self.user.username}"
