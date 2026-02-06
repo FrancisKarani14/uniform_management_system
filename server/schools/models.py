@@ -12,3 +12,9 @@ class School(models.Model):
 
     def __str__(self):
         return self.name
+
+# create a parent_school_application
+class Parent_school_application(models.Model):
+    parent = models.ForeignKey('users.ParentProfile', on_delete=models.CASCADE, related_name='parent_school_applications')
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='parent_school_applications')
+    student = models.ForeignKey('users.StudentProfile', on_delete=models.CASCADE, related_name='parent_school_applications')

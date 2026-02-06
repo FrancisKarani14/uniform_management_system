@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, AdminProfile, TailorProfile, SchoolAdminProfile, ParentProfile
+from .models import User, AdminProfile, TailorProfile, SchoolAdminProfile, ParentProfile, StudentProfile
 
 
 
@@ -24,4 +24,5 @@ admin.site.register(AdminProfile)
 admin.site.register(TailorProfile)
 admin.site.register(SchoolAdminProfile)
 admin.site.register(ParentProfile)
+admin.site.register(StudentProfile)
 
