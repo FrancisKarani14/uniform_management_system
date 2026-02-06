@@ -8,7 +8,3 @@ class Tailor_school_requestSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 # serialize Tailor_School_application model
-# class Parent_school_applicationSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Parent_school_application
-#         fields = ["parent", "school", "student_name", "student_age", "student_gender"]
