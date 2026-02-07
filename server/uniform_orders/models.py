@@ -15,7 +15,7 @@ class Uniform_order(models.Model):
 
 
     parent = models.ForeignKey('users.ParentProfile', on_delete=models.CASCADE,  related_name='uniform_order')
-    school = models.ForeignKey('scools.School', on_delete=models.CASCADE, related_name='uniform_order')
+    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='uniform_order')
     status = models.CharField(
         max_length=10, choices=STATUS_CHOICES, default='PENDING')
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
