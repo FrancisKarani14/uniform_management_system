@@ -7,4 +7,8 @@ class School_modelSerializer(serializers.ModelSerializer):
         model = School
         fields = '__all__'
 
-# serialize Tailor_School_application model
+# serialize Parent_school_application
+class Parent_school_application_modelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Parent_school_application
+        fields = '__all__'
