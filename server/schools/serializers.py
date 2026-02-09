@@ -11,4 +11,4 @@ class School_modelSerializer(serializers.ModelSerializer):
 class Parent_school_application_modelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Parent_school_application
-        fields = '__all__'
+        fields = ["parent.", "school", "student"]
