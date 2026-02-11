@@ -1,16 +1,16 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { RouterProvider } from 'react-router';
+import { Toaster } from './components/ui/sonner';
+import { AuthProvider } from './contexts/AuthContext';
+import { AppDataProvider } from './contexts/AppDataContext';
+import { router } from './routes';
 
-function App() {
-  
-
+export default function App() {
   return (
-    <>
-      <h1 className=' bg-[yellow] '>Vite + React</h1>
-    </>
-  )
+    <AuthProvider>
+      <AppDataProvider>
+        <RouterProvider router={router} />
+        <Toaster position="top-right" />
+      </AppDataProvider>
+    </AuthProvider>
+  );
 }
-
-export default App
