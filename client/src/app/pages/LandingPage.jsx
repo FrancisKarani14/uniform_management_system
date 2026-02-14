@@ -14,34 +14,34 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen">
       {/* Navigation */}
-      <nav className="flex justify-between items-center px-16 py-6 bg-white shadow-md relative z-10">
+      <nav className="fixed top-0 left-0 right-0 flex justify-between items-center px-16 py-4 bg-white shadow-md z-10">
         <div className="flex items-center">
-          <span className="text-2xl font-bold text-blue-700">uniformhub</span>
+          <span className="text-xl font-bold text-blue-700">uniformhub</span>
         </div>
-        <div className="flex gap-4">
-          <button className="px-6 py-2.5 bg-white text-blue-700 border-2 border-blue-700 rounded-md font-medium hover:bg-blue-50 transition-all">
+        <div className="flex gap-3">
+          <button className="px-5 py-2 bg-white text-blue-700 border-2 border-blue-700 rounded-md text-sm font-medium hover:bg-blue-50 transition-all">
             Sign In
           </button>
-          <button className="px-6 py-2.5 bg-blue-700 text-white rounded-md font-medium hover:bg-blue-800 transition-all">
+          <button className="px-5 py-2 bg-blue-700 text-white rounded-md text-sm font-medium hover:bg-blue-800 transition-all">
             Sign Up
           </button>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative h-[calc(100vh-80px)] overflow-hidden">
+      <section className="relative h-screen overflow-hidden">
         <div className="absolute w-full h-full">
           {images.map((img, index) => (
             <div
               key={index}
-              className={`absolute w-full h-full bg-cover bg-center transition-opacity duration-1000 ${
+              className={`absolute w-full h-full bg-cover bg-center bg-[center_20%] transition-opacity duration-1000 ${
                 index === currentSlide ? 'opacity-100' : 'opacity-0'
               }`}
               style={{ backgroundImage: `url(${img})` }}
             />
           ))}
         </div>
-        <div className="absolute w-full h-full bg-gradient-to-r from-white/95 via-white/70 to-transparent flex items-center px-16">
+        <div className="absolute w-full h-full bg-gradient-to-r from-white/95 via-white/70 to-transparent flex items-center px-16 pt-24">
           <div className="max-w-2xl">
             <h1 className="text-5xl font-bold mb-6 leading-tight text-gray-900">
               Simplify School Uniform Management
