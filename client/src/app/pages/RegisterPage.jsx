@@ -53,7 +53,10 @@ export default function RegisterPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <div className="flex-1 flex items-center justify-center bg-gray-50 px-4 pt-20 pb-12">
+      <div 
+        className="flex-1 flex items-center justify-center px-4 pt-20 pb-12 bg-cover bg-center"
+        style={{ backgroundImage: 'url(/images/issue.png)' }}
+      >
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
           <h1 className="text-3xl font-bold text-center mb-2 text-gray-900">Create an Account</h1>
           <p className="text-center text-gray-600 mb-8">
