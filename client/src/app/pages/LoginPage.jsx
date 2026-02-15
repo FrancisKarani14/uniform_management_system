@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -194,6 +195,13 @@ export default function LoginPage() {
               <span className="text-gray-700 font-medium">Sign in with Google</span>
             </button>
           </div>
+
+          <p className="mt-6 text-center text-sm text-gray-600">
+            Don't have an account?{' '}
+            <Link to="/signup" className="text-blue-700 font-medium hover:text-blue-800">
+              Sign up
+            </Link>
+          </p>
         </div>
       </div>
 
