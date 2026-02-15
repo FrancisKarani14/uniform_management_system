@@ -32,7 +32,7 @@ export default function LandingPage() {
             />
           ))}
         </div>
-        <div className="absolute w-full h-full bg-gradient-to-r from-white/95 via-white/70 to-transparent flex items-center px-16 pt-24">
+        <div className="absolute w-full h-full bg-gradient-to-r from-white/85 via-white/50 to-transparent flex items-center px-16 pt-24">
           <div className="max-w-2xl">
             <h1 className="text-5xl font-bold mb-6 leading-tight text-gray-900">
               Simplify School Uniform Management
