@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 export default function LandingPage() {
+  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const images = ['/images/issue.png', '/images/students.png', '/images/Tailor.png'];
 
@@ -39,7 +41,10 @@ export default function LandingPage() {
               Connect parents, tailors, and schools in one seamless platform.
               Streamline uniform applications, approvals, and delivery with UniformHub.
             </p>
-            <button className="px-10 py-4 bg-blue-700 text-white rounded-lg text-lg font-semibold hover:bg-blue-800 hover:-translate-y-0.5 transition-all shadow-lg shadow-blue-700/30 hover:shadow-xl hover:shadow-blue-700/40">
+            <button 
+              onClick={() => navigate('/login')}
+              className="px-10 py-4 bg-blue-700 text-white rounded-lg text-lg font-semibold hover:bg-blue-800 hover:-translate-y-0.5 transition-all shadow-lg shadow-blue-700/30 hover:shadow-xl hover:shadow-blue-700/40"
+            >
               Get Started
             </button>
           </div>
