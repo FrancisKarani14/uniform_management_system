@@ -12,6 +12,13 @@ import SystemAdminDashboard from './app/pages/SystemAdminDashboard';
 import AdminOverview from './app/pages/admin/AdminOverview';
 import UserManagement from './app/pages/admin/UserManagement';
 import AdminSchools from './app/pages/admin/AdminSchools';
+import SchoolAdminDashboard from './app/pages/SchoolAdminDashboard';
+import SchoolAdminOverview from './app/pages/schooladmin/SchoolAdminOverview';
+import ParentApplications from './app/pages/schooladmin/ParentApplications';
+import TailorApplications from './app/pages/schooladmin/TailorApplications';
+import UniformApplicationsSA from './app/pages/schooladmin/UniformApplications';
+import UniformAssignments from './app/pages/schooladmin/UniformAssignments';
+import Students from './app/pages/schooladmin/Students';
 
 export default function App() {
   return (
@@ -31,6 +38,14 @@ export default function App() {
           <Route index element={<AdminOverview />} />
           <Route path="user-management" element={<UserManagement />} />
           <Route path="schools" element={<AdminSchools />} />
+        </Route>
+        <Route path="/school-admin-dashboard" element={<SchoolAdminDashboard />}>
+          <Route index element={<SchoolAdminOverview />} />
+          <Route path="parent-applications" element={<ParentApplications />} />
+          <Route path="tailor-applications" element={<TailorApplications />} />
+          <Route path="uniform-applications" element={<UniformApplicationsSA />} />
+          <Route path="uniform-assignments" element={<UniformAssignments />} />
+          <Route path="students" element={<Students />} />
         </Route>
       </Routes>
     </BrowserRouter>
