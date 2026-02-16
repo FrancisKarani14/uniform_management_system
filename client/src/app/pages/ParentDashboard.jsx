@@ -1,4 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { AiOutlineHome, AiOutlineSearch, AiOutlineTeam, AiOutlineFileText, AiOutlineBank } from 'react-icons/ai';
+import { FaGraduationCap } from 'react-icons/fa';
 
 export default function ParentDashboard() {
   const navigate = useNavigate();
@@ -11,7 +13,10 @@ export default function ParentDashboard() {
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
       <nav className="bg-white shadow-md px-8 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-blue-700">UniformHub</h1>
+        <div className="flex items-center gap-2">
+          <FaGraduationCap className="text-3xl text-blue-700" />
+          <h1 className="text-2xl font-bold text-blue-700">UniformHub</h1>
+        </div>
         <button
           onClick={handleLogout}
           className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all"
@@ -28,62 +33,67 @@ export default function ParentDashboard() {
               to="/parent-dashboard"
               end
               className={({ isActive }) =>
-                `block px-4 py-3 rounded-md transition-all ${
+                `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
                   isActive
                     ? 'bg-blue-700 text-white'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
-              Overview
+              <AiOutlineHome className="text-xl" />
+              <span>Overview</span>
             </NavLink>
             <NavLink
               to="/parent-dashboard/browse-schools"
               className={({ isActive }) =>
-                `block px-4 py-3 rounded-md transition-all ${
+                `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
                   isActive
                     ? 'bg-blue-700 text-white'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
-              Browse Schools
+              <AiOutlineSearch className="text-xl" />
+              <span>Browse Schools</span>
             </NavLink>
             <NavLink
               to="/parent-dashboard/my-students"
               className={({ isActive }) =>
-                `block px-4 py-3 rounded-md transition-all ${
+                `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
                   isActive
                     ? 'bg-blue-700 text-white'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
-              My Students
+              <AiOutlineTeam className="text-xl" />
+              <span>My Students</span>
             </NavLink>
             <NavLink
               to="/parent-dashboard/uniform-applications"
               className={({ isActive }) =>
-                `block px-4 py-3 rounded-md transition-all ${
+                `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
                   isActive
                     ? 'bg-blue-700 text-white'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
-              Uniform Applications
+              <AiOutlineFileText className="text-xl" />
+              <span>Uniform Applications</span>
             </NavLink>
             <NavLink
               to="/parent-dashboard/my-schools"
               className={({ isActive }) =>
-                `block px-4 py-3 rounded-md transition-all ${
+                `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
                   isActive
                     ? 'bg-blue-700 text-white'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
-              My Schools
+              <AiOutlineBank className="text-xl" />
+              <span>My Schools</span>
             </NavLink>
           </nav>
         </aside>
