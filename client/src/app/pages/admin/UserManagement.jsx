@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FaCrown } from 'react-icons/fa';
 
 export default function UserManagement() {
   const [users, setUsers] = useState({
@@ -64,9 +65,7 @@ export default function UserManagement() {
                       onClick={() => handleUpgradeClick(user)}
                       className="flex items-center gap-2 px-4 py-2 border-2 border-blue-700 text-blue-700 rounded-md hover:bg-gray-100 transition-all font-medium"
                     >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L11 4.323V3a1 1 0 011-1zm-5 8.274l-.818 2.552c-.25.78.409 1.674 1.318 1.674H14.5c.909 0 1.568-.894 1.318-1.674l-.818-2.552a1 1 0 00-.95-.69h-8.1a1 1 0 00-.95.69zM10 14a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
-                      </svg>
+                      <FaCrown className="w-4 h-4" />
                       Upgrade to School Admin
                     </button>
                   </td>
@@ -133,7 +132,8 @@ export default function UserManagement() {
 
       {/* Confirmation Modal */}
       {showConfirm && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+          <div className="pointer-events-auto">
           <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl border border-gray-200">
             <h3 className="text-2xl font-bold mb-4 text-gray-900">Confirm Upgrade</h3>
             <p className="text-gray-700 mb-4">
@@ -166,6 +166,7 @@ export default function UserManagement() {
                 Confirm Upgrade
               </button>
             </div>
+          </div>
           </div>
         </div>
       )}
