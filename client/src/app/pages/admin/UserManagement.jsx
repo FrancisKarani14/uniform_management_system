@@ -1,67 +1,174 @@
 import { useState } from 'react';
 
 export default function UserManagement() {
-  const [users, setUsers] = useState([
-    { id: 1, name: 'Alice Johnson', email: 'alice@example.com', role: 'Parent' },
-    { id: 2, name: 'Bob Smith', email: 'bob@example.com', role: 'Parent' },
-    { id: 3, name: 'Carol Williams', email: 'carol@example.com', role: 'Parent' },
-    { id: 4, name: 'David Brown', email: 'david@example.com', role: 'Parent' },
-    { id: 5, name: 'Emma Davis', email: 'emma@example.com', role: 'Parent' }
-  ]);
+  const [users, setUsers] = useState({
+    parents: [
+      { id: 1, name: 'Alice Johnson', email: 'alice@example.com' },
+      { id: 2, name: 'Bob Smith', email: 'bob@example.com' },
+      { id: 3, name: 'Carol Williams', email: 'carol@example.com' },
+      { id: 4, name: 'David Brown', email: 'david@example.com' },
+      { id: 5, name: 'Emma Davis', email: 'emma@example.com' }
+    ],
+    tailors: [
+      { id: 6, name: 'Frank Taylor', email: 'frank@example.com' },
+      { id: 7, name: 'Grace Miller', email: 'grace@example.com' },
+      { id: 8, name: 'Henry Wilson', email: 'henry@example.com' }
+    ],
+    schoolAdmins: [
+      { id: 9, name: 'Ivy Moore', email: 'ivy@example.com', school: 'Greenwood High School' },
+      { id: 10, name: 'Jack Taylor', email: 'jack@example.com', school: null }
+    ]
+  });
 
-  const handleUpgrade = (userId) => {
-    setUsers(users.map(user => 
-      user.id === userId 
-        ? { ...user, role: 'School Admin' }
-        : user
-    ));
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [userToUpgrade, setUserToUpgrade] = useState(null);
+
+  const handleUpgradeClick = (user) => {
+    setUserToUpgrade(user);
+    setShowConfirm(true);
+  };
+
+  const confirmUpgrade = () => {
+    setUsers({
+      ...users,
+      parents: users.parents.filter(p => p.id !== userToUpgrade.id),
+      schoolAdmins: [...users.schoolAdmins, { ...userToUpgrade, school: null }]
+    });
+    setShowConfirm(false);
+    setUserToUpgrade(null);
   };
 
   return (
     <div>
       <h2 className="text-3xl font-bold mb-8 text-gray-900">User Management</h2>
       
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td className="px-6 py-4 text-sm text-gray-900">{user.name}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    user.role === 'School Admin' 
-                      ? 'bg-purple-100 text-purple-800' 
-                      : 'bg-blue-100 text-blue-800'
-                  }`}>
-                    {user.role}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm">
-                  {user.role === 'Parent' ? (
+      {/* Parents Section */}
+      <div className="mb-8">
+        <h3 className="text-xl font-bold mb-4 text-gray-900">Parents ({users.parents.length})</h3>
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {users.parents.map((user) => (
+                <tr key={user.id}>
+                  <td className="px-6 py-4 text-sm text-gray-900 font-bold">{user.name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600 font-bold">{user.email}</td>
+                  <td className="px-6 py-4 text-sm">
                     <button 
-                      onClick={() => handleUpgrade(user.id)}
-                      className="text-blue-700 hover:text-blue-800 font-medium"
+                      onClick={() => handleUpgradeClick(user)}
+                      className="flex items-center gap-2 px-4 py-2 border-2 border-blue-700 text-blue-700 rounded-md hover:bg-gray-100 transition-all font-medium"
                     >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L11 4.323V3a1 1 0 011-1zm-5 8.274l-.818 2.552c-.25.78.409 1.674 1.318 1.674H14.5c.909 0 1.568-.894 1.318-1.674l-.818-2.552a1 1 0 00-.95-.69h-8.1a1 1 0 00-.95.69zM10 14a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
+                      </svg>
                       Upgrade to School Admin
                     </button>
-                  ) : (
-                    <span className="text-gray-400">Upgraded</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
+
+      {/* Tailors Section */}
+      <div className="mb-8">
+        <h3 className="text-xl font-bold mb-4 text-gray-900">Tailors ({users.tailors.length})</h3>
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {users.tailors.map((user) => (
+                <tr key={user.id}>
+                  <td className="px-6 py-4 text-sm text-gray-900 font-bold">{user.name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600 font-bold">{user.email}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* School Admins Section */}
+      <div>
+        <h3 className="text-xl font-bold mb-4 text-gray-900">School Administrators ({users.schoolAdmins.length})</h3>
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">School</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {users.schoolAdmins.map((user) => (
+                <tr key={user.id}>
+                  <td className="px-6 py-4 text-sm text-gray-900 font-bold">{user.name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600 font-bold">{user.email}</td>
+                  <td className="px-6 py-4 text-sm">
+                    {user.school ? (
+                      <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">{user.school}</span>
+                    ) : (
+                      <span className="px-3 py-1 bg-red-100 text-red-600 rounded-full text-xs font-medium">No school created</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Confirmation Modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl border border-gray-200">
+            <h3 className="text-2xl font-bold mb-4 text-gray-900">Confirm Upgrade</h3>
+            <p className="text-gray-700 mb-4">
+              You are about to upgrade <strong>{userToUpgrade?.name}</strong> to School Administrator.
+            </p>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
+              <h4 className="font-bold text-yellow-800 mb-2">Consequences:</h4>
+              <ul className="text-sm text-yellow-700 space-y-1 list-disc list-inside">
+                <li>User will be removed from Parents list</li>
+                <li>User will gain school management privileges</li>
+                <li>User can approve/reject uniform applications</li>
+                <li>User can manage school enrollment</li>
+                <li>This action cannot be easily reversed</li>
+              </ul>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowConfirm(false);
+                  setUserToUpgrade(null);
+                }}
+                className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmUpgrade}
+                className="flex-1 px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition-all"
+              >
+                Confirm Upgrade
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -47,7 +47,7 @@ export default function BrowseSchools() {
           <tbody className="divide-y divide-gray-200">
             {schools.map((school) => (
               <tr key={school.id}>
-                <td className="px-6 py-4 text-sm text-gray-900">{school.name}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{school.name}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{school.location}</td>
                 <td className="px-6 py-4 text-sm">
                   <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(school.status)}`}>

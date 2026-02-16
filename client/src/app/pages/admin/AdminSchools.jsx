@@ -41,14 +41,14 @@ export default function AdminSchools() {
           <tbody className="divide-y divide-gray-200">
             {schools.map((school) => (
               <tr key={school.id}>
-                <td className="px-6 py-4 text-sm text-gray-900">{school.name}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{school.name}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{school.location}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{school.students}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{school.admin}</td>
+                <td className="px-6 py-4 text-sm text-gray-600 font-bold">{school.admin}</td>
                 <td className="px-6 py-4 text-sm">
                   <button 
                     onClick={() => handleDeleteClick(school)}
-                    className="text-red-600 hover:text-red-800 font-medium"
+                    className="px-4 py-2 border-2 border-red-600 text-red-600 rounded-md hover:bg-red-50 transition-all font-medium"
                   >
                     Delete
                   </button>
