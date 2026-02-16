@@ -1,9 +1,34 @@
+import { useState } from 'react';
+
 export default function BrowseSchools() {
-  const schools = [
+  const [schools, setSchools] = useState([
     { id: 1, name: 'Greenwood High School', location: 'Nairobi', status: 'Available' },
     { id: 2, name: 'Sunrise Academy', location: 'Mombasa', status: 'Available' },
     { id: 3, name: 'Valley View School', location: 'Kisumu', status: 'Available' }
-  ];
+  ]);
+
+  const handleApply = (schoolId) => {
+    setSchools(schools.map(school => 
+      school.id === schoolId 
+        ? { ...school, status: 'Pending' }
+        : school
+    ));
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Available':
+        return 'bg-green-100 text-green-800';
+      case 'Pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'Approved':
+        return 'bg-blue-100 text-blue-800';
+      case 'Rejected':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
     <div>
@@ -25,12 +50,21 @@ export default function BrowseSchools() {
                 <td className="px-6 py-4 text-sm text-gray-900">{school.name}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{school.location}</td>
                 <td className="px-6 py-4 text-sm">
-                  <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                  <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(school.status)}`}>
                     {school.status}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm">
-                  <button className="text-blue-700 hover:text-blue-800 font-medium">Apply</button>
+                  {school.status === 'Available' ? (
+                    <button 
+                      onClick={() => handleApply(school.id)}
+                      className="text-blue-700 hover:text-blue-800 font-medium"
+                    >
+                      Apply
+                    </button>
+                  ) : (
+                    <span className="text-gray-400">Applied</span>
+                  )}
                 </td>
               </tr>
             ))}
