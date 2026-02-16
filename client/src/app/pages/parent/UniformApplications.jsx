@@ -38,7 +38,7 @@ export default function UniformApplications() {
           <tbody className="divide-y divide-gray-200">
             {applications.map((app) => (
               <tr key={app.id}>
-                <td className="px-6 py-4 text-sm text-gray-900">{app.student}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.student}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{app.school}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{app.date}</td>
                 <td className="px-6 py-4 text-sm">
