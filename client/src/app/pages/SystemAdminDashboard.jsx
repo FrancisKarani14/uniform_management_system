@@ -1,4 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { AiOutlineHome, AiOutlineUser, AiOutlineBank } from 'react-icons/ai';
+import { FaGraduationCap } from 'react-icons/fa';
 
 export default function SystemAdminDashboard() {
   const navigate = useNavigate();
@@ -11,7 +13,10 @@ export default function SystemAdminDashboard() {
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
       <nav className="bg-white shadow-md px-8 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-blue-700">UniformHub - Admin</h1>
+        <div className="flex items-center gap-2">
+          <FaGraduationCap className="text-3xl text-blue-700" />
+          <h1 className="text-2xl font-bold text-blue-700">UniformHub - Admin</h1>
+        </div>
         <button
           onClick={handleLogout}
           className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all"
@@ -28,38 +33,41 @@ export default function SystemAdminDashboard() {
               to="/admin-dashboard"
               end
               className={({ isActive }) =>
-                `block px-4 py-3 rounded-md transition-all ${
+                `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
                   isActive
                     ? 'bg-blue-700 text-white'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
-              Overview
+              <AiOutlineHome className="text-xl" />
+              <span>Overview</span>
             </NavLink>
             <NavLink
               to="/admin-dashboard/user-management"
               className={({ isActive }) =>
-                `block px-4 py-3 rounded-md transition-all ${
+                `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
                   isActive
                     ? 'bg-blue-700 text-white'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
-              User Management
+              <AiOutlineUser className="text-xl" />
+              <span>User Management</span>
             </NavLink>
             <NavLink
               to="/admin-dashboard/schools"
               className={({ isActive }) =>
-                `block px-4 py-3 rounded-md transition-all ${
+                `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
                   isActive
                     ? 'bg-blue-700 text-white'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
-              Schools
+              <AiOutlineBank className="text-xl" />
+              <span>Schools</span>
             </NavLink>
           </nav>
         </aside>
