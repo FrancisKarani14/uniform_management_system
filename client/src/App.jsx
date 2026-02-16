@@ -8,6 +8,10 @@ import BrowseSchools from './app/pages/parent/BrowseSchools';
 import MyStudents from './app/pages/parent/MyStudents';
 import UniformApplications from './app/pages/parent/UniformApplications';
 import MySchools from './app/pages/parent/MySchools';
+import SystemAdminDashboard from './app/pages/SystemAdminDashboard';
+import AdminOverview from './app/pages/admin/AdminOverview';
+import UserManagement from './app/pages/admin/UserManagement';
+import AdminSchools from './app/pages/admin/AdminSchools';
 
 export default function App() {
   return (
@@ -22,6 +26,11 @@ export default function App() {
           <Route path="my-students" element={<MyStudents />} />
           <Route path="uniform-applications" element={<UniformApplications />} />
           <Route path="my-schools" element={<MySchools />} />
+        </Route>
+        <Route path="/admin-dashboard" element={<SystemAdminDashboard />}>
+          <Route index element={<AdminOverview />} />
+          <Route path="user-management" element={<UserManagement />} />
+          <Route path="schools" element={<AdminSchools />} />
         </Route>
       </Routes>
     </BrowserRouter>
