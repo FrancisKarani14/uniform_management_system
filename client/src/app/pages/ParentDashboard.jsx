@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { AiOutlineHome, AiOutlineSearch, AiOutlineTeam, AiOutlineFileText, AiOutlineBank } from 'react-icons/ai';
 import { FaGraduationCap } from 'react-icons/fa';
 
@@ -13,21 +13,27 @@ export default function ParentDashboard() {
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
       <nav className="bg-white shadow-md px-8 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <FaGraduationCap className="text-3xl text-blue-700" />
           <h1 className="text-2xl font-bold text-blue-700">UniformHub</h1>
+        </Link>
+        <div className="flex items-center gap-4">
+          <span className="text-gray-700 font-bold">John Parent</span>
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all"
+          >
+            Logout
+          </button>
         </div>
-        <button
-          onClick={handleLogout}
-          className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all"
-        >
-          Logout
-        </button>
       </nav>
 
       <div className="flex">
         {/* Sidebar */}
         <aside className="w-64 bg-white shadow-md min-h-[calc(100vh-72px)] p-6">
+          <div className="mb-6">
+            <h2 className="text-lg font-bold text-gray-900">Parent Dashboard</h2>
+          </div>
           <nav className="space-y-2">
             <NavLink
               to="/parent-dashboard"

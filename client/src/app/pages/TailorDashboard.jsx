@@ -17,13 +17,13 @@ export default function TailorDashboard() {
       <nav className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-2">
               <FaGraduationCap className="text-blue-700 text-2xl" />
               <span className="text-2xl font-bold text-blue-700">UniformHub</span>
-            </div>
+            </Link>
             <div className="flex items-center gap-4">
-              <span className="text-gray-700">Tailor Dashboard</span>
-              <button className="px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800">
+              <span className="text-gray-700 font-bold">Mike Tailor</span>
+              <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all">
                 Logout
               </button>
             </div>
@@ -34,6 +34,9 @@ export default function TailorDashboard() {
       <div className="flex">
         {/* Sidebar */}
         <aside className="w-64 bg-white shadow-md min-h-[calc(100vh-4rem)]">
+          <div className="p-4 mb-2">
+            <h2 className="text-lg font-bold text-gray-900">Tailor Dashboard</h2>
+          </div>
           <nav className="p-4">
             <ul className="space-y-2">
               <li>
