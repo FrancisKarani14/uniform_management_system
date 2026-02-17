@@ -9,7 +9,8 @@ export default function Overview() {
     { id: 1, student: 'John Doe', school: 'Greenwood High School', tailorProgress: 'received', tailor: 'Mike Tailor', date: '2025-01-15' },
     { id: 2, student: 'Jane Doe', school: 'Greenwood High School', tailorProgress: 'halfway', tailor: 'Sarah Tailor', date: '2025-01-10' },
     { id: 3, student: 'Mike Doe', school: 'Sunrise Academy', tailorProgress: 'started', tailor: 'Mike Tailor', date: '2025-01-18' },
-    { id: 4, student: 'Jane Doe', school: 'Greenwood High School', tailorProgress: 'complete', tailor: 'Mike Tailor', date: '2025-01-12' }
+    { id: 4, student: 'Jane Doe', school: 'Greenwood High School', tailorProgress: 'complete', tailor: 'Mike Tailor', date: '2025-01-12' },
+    { id: 5, student: 'Tom Doe', school: 'Valley View School', tailorProgress: 'received', tailor: 'Sarah Tailor', date: '2025-01-14' }
   ];
 
   const getTailorProgressBadge = (progress) => {
@@ -69,7 +70,7 @@ export default function Overview() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {recentApplications.map((app) => (
+              {recentApplications.slice(0, 4).map((app) => (
                 <tr key={app.id}>
                   <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.student}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{app.school}</td>
@@ -80,6 +81,11 @@ export default function Overview() {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-4 text-center">
+          <button className="px-6 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition-all">
+            View More
+          </button>
         </div>
       </div>
     </div>

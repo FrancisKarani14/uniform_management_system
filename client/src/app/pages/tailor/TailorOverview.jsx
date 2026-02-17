@@ -10,7 +10,8 @@ export default function TailorOverview() {
     { id: 1, studentName: 'John Doe', school: 'Greenwood High School', uniformType: 'Full Set', status: 'received', dueDate: '2024-02-15' },
     { id: 2, studentName: 'Jane Smith', school: 'Sunrise Academy', uniformType: 'Shirt & Trousers', status: 'started', dueDate: '2024-02-20' },
     { id: 3, studentName: 'Mike Johnson', school: 'Greenwood High School', uniformType: 'Full Set', status: 'halfway', dueDate: '2024-02-18' },
-    { id: 4, studentName: 'Sarah Williams', school: 'Valley View School', uniformType: 'Dress', status: 'complete', dueDate: '2024-02-10' }
+    { id: 4, studentName: 'Sarah Williams', school: 'Valley View School', uniformType: 'Dress', status: 'complete', dueDate: '2024-02-10' },
+    { id: 5, studentName: 'Tom Brown', school: 'Sunrise Academy', uniformType: 'Full Set', status: 'started', dueDate: '2024-02-25' }
   ];
 
   const getStatusBadge = (status) => {
@@ -75,7 +76,7 @@ export default function TailorOverview() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {recentAssignments.map((assignment) => (
+              {recentAssignments.slice(0, 4).map((assignment) => (
                 <tr key={assignment.id}>
                   <td className="px-6 py-4 text-sm text-gray-900 font-bold">{assignment.studentName}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{assignment.school}</td>
@@ -86,6 +87,11 @@ export default function TailorOverview() {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-4 text-center">
+          <button className="px-6 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition-all">
+            View More
+          </button>
         </div>
       </div>
     </div>
