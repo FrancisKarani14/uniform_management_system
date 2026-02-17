@@ -19,6 +19,11 @@ import TailorApplications from './app/pages/schooladmin/TailorApplications';
 import UniformApplicationsSA from './app/pages/schooladmin/UniformApplications';
 import UniformAssignments from './app/pages/schooladmin/UniformAssignments';
 import Students from './app/pages/schooladmin/Students';
+import TailorDashboard from './app/pages/TailorDashboard';
+import TailorOverview from './app/pages/tailor/TailorOverview';
+import TailorBrowseSchools from './app/pages/tailor/TailorBrowseSchools';
+import TailorMySchools from './app/pages/tailor/TailorMySchools';
+import TailorMyAssignments from './app/pages/tailor/TailorMyAssignments';
 
 export default function App() {
   return (
@@ -46,6 +51,12 @@ export default function App() {
           <Route path="uniform-applications" element={<UniformApplicationsSA />} />
           <Route path="uniform-assignments" element={<UniformAssignments />} />
           <Route path="students" element={<Students />} />
+        </Route>
+        <Route path="/tailor-dashboard" element={<TailorDashboard />}>
+          <Route index element={<TailorOverview />} />
+          <Route path="browse-schools" element={<TailorBrowseSchools />} />
+          <Route path="my-schools" element={<TailorMySchools />} />
+          <Route path="my-assignments" element={<TailorMyAssignments />} />
         </Route>
       </Routes>
     </BrowserRouter>
