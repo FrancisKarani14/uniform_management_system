@@ -17,17 +17,23 @@ export default function SchoolAdminDashboard() {
           <FaGraduationCap className="text-3xl text-blue-700" />
           <h1 className="text-2xl font-bold text-blue-700">UniformHub - School Admin</h1>
         </div>
-        <button
-          onClick={handleLogout}
-          className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all"
-        >
-          Logout
-        </button>
+        <div className="flex items-center gap-4">
+          <span className="text-gray-700 font-bold">Jane School Admin</span>
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all"
+          >
+            Logout
+          </button>
+        </div>
       </nav>
 
       <div className="flex">
         {/* Sidebar */}
         <aside className="w-64 bg-white shadow-md min-h-[calc(100vh-72px)] p-6">
+          <div className="mb-6">
+            <h2 className="text-lg font-bold text-gray-900">School Admin Dashboard</h2>
+          </div>
           <nav className="space-y-2">
             <NavLink
               to="/school-admin-dashboard"

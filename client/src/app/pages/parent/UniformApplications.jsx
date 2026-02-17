@@ -1,11 +1,34 @@
 export default function UniformApplications() {
   const applications = [
-    { id: 1, student: 'John Doe', school: 'Greenwood High School', status: 'Pending', date: '2025-01-15' },
-    { id: 2, student: 'Jane Doe', school: 'Greenwood High School', status: 'Approved', date: '2025-01-10' },
-    { id: 3, student: 'Mike Doe', school: 'Sunrise Academy', status: 'Pending', date: '2025-01-18' },
-    { id: 4, student: 'John Doe', school: 'Greenwood High School', status: 'Rejected', date: '2025-01-05' },
-    { id: 5, student: 'Jane Doe', school: 'Greenwood High School', status: 'Approved', date: '2025-01-12' }
+    { id: 1, student: 'John Doe', school: 'Greenwood High School', status: 'Approved', date: '2025-01-15', tailorProgress: 'received', tailor: 'Mike Tailor' },
+    { id: 2, student: 'Jane Doe', school: 'Greenwood High School', status: 'Approved', date: '2025-01-10', tailorProgress: 'halfway', tailor: 'Sarah Tailor' },
+    { id: 3, student: 'Mike Doe', school: 'Sunrise Academy', status: 'Pending', date: '2025-01-18', tailorProgress: null, tailor: null },
+    { id: 4, student: 'John Doe', school: 'Greenwood High School', status: 'Rejected', date: '2025-01-05', tailorProgress: null, tailor: null },
+    { id: 5, student: 'Jane Doe', school: 'Greenwood High School', status: 'Approved', date: '2025-01-12', tailorProgress: 'complete', tailor: 'Mike Tailor' }
   ];
+
+  const getTailorProgressBadge = (progress) => {
+    if (!progress) return null;
+    const badges = {
+      pending: 'bg-yellow-100 text-yellow-700',
+      received: 'bg-blue-100 text-blue-700',
+      started: 'bg-purple-100 text-purple-700',
+      halfway: 'bg-orange-100 text-orange-700',
+      complete: 'bg-green-100 text-green-700'
+    };
+    const labels = {
+      pending: 'Pending',
+      received: 'Received',
+      started: 'Started',
+      halfway: 'Halfway Done',
+      complete: 'Complete'
+    };
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs ${badges[progress]}`}>
+        {labels[progress]}
+      </span>
+    );
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -32,6 +55,8 @@ export default function UniformApplications() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">School</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tailor</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Progress</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
             </tr>
           </thead>
@@ -45,6 +70,10 @@ export default function UniformApplications() {
                   <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(app.status)}`}>
                     {app.status}
                   </span>
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-600 font-bold">{app.tailor || '-'}</td>
+                <td className="px-6 py-4 text-sm">
+                  {app.tailorProgress ? getTailorProgressBadge(app.tailorProgress) : <span className="text-gray-400">-</span>}
                 </td>
                 <td className="px-6 py-4 text-sm">
                   <button className="text-blue-700 hover:text-blue-800 font-medium">View</button>
