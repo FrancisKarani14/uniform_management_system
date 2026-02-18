@@ -25,22 +25,23 @@ export default function LandingPage() {
           {images.map((img, index) => (
             <div
               key={index}
-              className={`absolute w-full h-full bg-cover bg-center bg-[center_20%] transition-opacity duration-1000 ${
+              className={`absolute w-full h-full bg-cover  bg-[center_20%] transition-opacity duration-1000 ${
                 index === currentSlide ? 'opacity-100' : 'opacity-0'
               }`}
               style={{ backgroundImage: `url(${img})` }}
             />
           ))}
         </div>
+        <div className="absolute w-full h-full bg-white/25"></div>
         <div className="absolute w-full h-full flex items-center px-16 pt-24">
           <div className="max-w-2xl">
-            <h1 className="text-5xl font-bold mb-6 leading-tight text-white">
+            <h1 className="text-5xl font-bold mb-6 leading-tight text-gray-900">
               Simplify School Uniform Management
             </h1>
-            {/* <p className="text-xl leading-relaxed mb-8 text-black">
+            <p className="text-xl leading-relaxed mb-8 text-white">
               Connect parents, tailors, and schools in one seamless platform.
               Streamline uniform applications, approvals, and delivery with UniformHub.
-            </p> */}
+            </p>
             <button 
               onClick={() => navigate('/login')}
               className="px-10 py-4 bg-blue-700 text-white rounded-lg text-lg font-semibold hover:bg-blue-800 hover:-translate-y-0.5 transition-all shadow-lg shadow-blue-700/30 hover:shadow-xl hover:shadow-blue-700/40"
