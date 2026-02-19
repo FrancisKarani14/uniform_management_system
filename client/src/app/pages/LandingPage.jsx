@@ -38,13 +38,13 @@ export default function LandingPage() {
             <h1 className="text-5xl font-bold mb-6 leading-tight text-gray-900">
               Simplify School Uniform Management
             </h1>
-            <p className="text-xl leading-relaxed mb-8 text-white">
+            <p className="text-xl leading-relaxed mb-8 text-black font-semibold">
               Connect parents, tailors, and schools in one seamless platform.
               Streamline uniform applications, approvals, and delivery with UniformHub.
             </p>
             <button 
               onClick={() => navigate('/login')}
-              className="px-10 py-4 bg-blue-700 text-white rounded-lg text-lg font-semibold hover:bg-blue-800 hover:-translate-y-0.5 transition-all shadow-lg shadow-blue-700/30 hover:shadow-xl hover:shadow-blue-700/40"
+              className="px-6 py-2 bg-blue-700 text-white rounded-lg text-lg font-semibold hover:bg-blue-800 hover:-translate-y-0.5 transition-all shadow-lg shadow-blue-700/30 hover:shadow-xl hover:shadow-blue-700/40"
             >
               Get Started
             </button>
