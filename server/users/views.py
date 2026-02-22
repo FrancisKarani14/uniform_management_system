@@ -1,7 +1,17 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from .models import User, AdminProfile, TailorProfile, SchoolAdminProfile, ParentProfile, StudentProfile
-from .serializers import UserSerializer, TailorProfileSerializer, ParentProfileSerializer, SchoolAdminProfile, StudentProfileSerializer, AdminProfileSerializer   
+from .serializers import UserSerializer, TailorProfileSerializer, ParentProfileSerializer, SchoolAdminProfile, StudentProfileSerializer, AdminProfileSerializer  
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.views import TokenObtainPairView
+# from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from .serializers import CustomTokenSerializer 
+
+# creates a custom token view
+
+
+class CustomTokenView(TokenObtainPairView):
+    serializer_class = CustomTokenSerializer
 
 # Create your views here.
 # user viewset

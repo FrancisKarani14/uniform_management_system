@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import User, AdminProfile, TailorProfile, SchoolAdminProfile, ParentProfile, StudentProfile
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView  
-from django.contrib.auth import aauthenticate
+from django.contrib.auth import authenticate
 
 # creates a custom serialer
 
