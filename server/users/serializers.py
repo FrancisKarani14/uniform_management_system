@@ -1,6 +1,30 @@
 from rest_framework import serializers
 from .models import User, AdminProfile, TailorProfile, SchoolAdminProfile, ParentProfile, StudentProfile
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView  
+from django.contrib.auth import authenticate
 
+# creates a custom serialer
+
+
+class CustomTokenSerializer(TokenObtainPairSerializer):
+    username_field = 'email'
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        user = authenticate(
+            request=self.context.get('request'),
+            username=email,   
+            password=password
+        )
+
+        if user is None:
+            raise Exception("Invalid email or password")
+
+        data = super().validate(attrs)
+        return data
 
 # serialize user model
 class UserSerializer(serializers.ModelSerializer):

@@ -10,7 +10,12 @@ class User(AbstractUser):
         SCHOOL_ADMIN =  'School_Admin'
         PARENT =  'Parent'
         STUDENT = 'Student'
+    username = None   
+    email = models.EmailField(unique=True)
     role = models.CharField(max_length=20, choices=Roles.choices)
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+    
 
 
 # creates profile models
