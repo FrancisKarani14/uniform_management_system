@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 # from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .serializers import CustomTokenSerializer
-from .permissions import IsSystemAdmin 
+from .permissions import IsSystemAdmin, IsTailor, IsParent, IsSchoolAdmin, IsStudent 
 
 # creates a custom token view
 
@@ -64,23 +64,28 @@ class UserViewSet(viewsets.ModelViewSet):
 class AdminProfileViewSet(viewsets.ModelViewSet):
     queryset = AdminProfile.objects.all()
     serializer_class = AdminProfileSerializer
+    permission_classes = [IsSystemAdmin]
 
 # school adminprofile viewset
 class SchoolAdminProfileViewSet(viewsets.ModelViewSet):
     queryset = SchoolAdminProfile.objects.all()
     serializer_class = SchoolAdminProfile
+    permission_classes = [IsSystemAdmin | IsSchoolAdmin]
 
 # Tailor profile viewset
 class TailorProfileViewSet(viewsets.ModelViewSet):
     queryset = TailorProfile.objects.all()
     serializer_class = TailorProfileSerializer
+    permission_classes = [IsSystemAdmin | IsTailor]
 
 # parent profile viewset
 class ParentProfileViewSet(viewsets.ModelViewSet):
     queryset = ParentProfile.objects.all()
     serializer_class = ParentProfileSerializer
+    permission_classes = [IsSystemAdmin | IsParent]
 
 # student profile viewset
 class StudentProfileViewSet(viewsets.ModelViewSet):
     queryset = StudentProfile.objects.all()
     serializer_class = StudentProfileSerializer
+    permission_classes = [IsSystemAdmin | IsStudent]
