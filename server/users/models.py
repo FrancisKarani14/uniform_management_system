@@ -65,11 +65,12 @@ class TailorProfile(models.Model):
 
 class SchoolAdminProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='school_admin_profile')
-    school = models.OneToOneField('schools.School', on_delete=models.CASCADE, related_name='school_admin_profile')
+    school = models.OneToOneField('schools.School', on_delete=models.CASCADE, related_name='school_admin_profile', null=True, blank=True)
     phone_number = models.CharField(max_length=15)
 
     def __str__(self):
-        return f"{self.user.username} - {self.school.name}"
+        school_name = self.school.name if self.school else 'No School'
+        return f"{self.user.email} - {school_name}"
 
 
 class ParentProfile(models.Model):

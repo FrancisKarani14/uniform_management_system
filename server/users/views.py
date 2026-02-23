@@ -27,7 +27,7 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Upgrade a Parent user to School Admin.
         POST /api/users/{id}/upgrade_to_school_admin/
-        Body: { "school_id": 1, "phone_number": "123456789" }
+        Body: { "phone_number": "123456789" }  // optional
         """
         user = self.get_object()
         
@@ -38,29 +38,24 @@ class UserViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Validate required fields
-        school_id = request.data.get('school_id')
+        # Get phone number from request or use parent's phone
         phone_number = request.data.get('phone_number')
-        
-        if not school_id:
-            return Response(
-                {'error': 'school_id is required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        if not phone_number and hasattr(user, 'parent_profile'):
+            phone_number = user.parent_profile.phone_number
         
         # Change user role
         user.role = 'School_Admin'
         user.save()
         
-        # Create SchoolAdminProfile
+        # Create SchoolAdminProfile without school (school will be created later)
         SchoolAdminProfile.objects.create(
             user=user,
-            school_id=school_id,
-            phone_number=phone_number or user.parent_profile.phone_number
+            school=None,  # No school assigned yet
+            phone_number=phone_number
         )
         
         return Response({
-            'message': 'User successfully upgraded to School Admin',
+            'message': 'User successfully upgraded to School Admin. They can now create a school.',
             'user': UserSerializer(user).data
         }, status=status.HTTP_200_OK)
 
