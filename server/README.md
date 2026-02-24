@@ -7,7 +7,8 @@ A Django REST API backend for managing school uniform orders, connecting parents
 - **Framework**: Django 6.0.2
 - **API**: Django REST Framework
 - **Database**: SQLite (Development) / PostgreSQL (Production)
-- **Authentication**: Django Auth with Custom User Model
+- **Authentication**: JWT (SimpleJWT) with Custom User Model
+- **Authorization**: Role-Based Access Control (RBAC)
 - **CORS**: django-cors-headers
 
 ## Project Structure
@@ -21,18 +22,22 @@ server/
 │   ├── models.py          # User and profile models
 │   ├── views.py           # User API views
 │   ├── serializers.py     # User serializers
+│   ├── permissions.py     # User role permissions
 │   └── urls.py            # User routes
 ├── schools/                # School management app
 │   ├── models.py          # School models
 │   ├── views.py           # School API views
+│   ├── permissions.py     # School permissions
 │   └── urls.py            # School routes
 ├── tailors/                # Tailor management app
 │   ├── models.py          # Tailor request models
 │   ├── views.py           # Tailor API views
+│   ├── permissions.py     # Tailor permissions
 │   └── urls.py            # Tailor routes
 ├── uniform_orders/         # Uniform order management
 │   ├── models.py          # Order and assignment models
 │   ├── views.py           # Order API views
+│   ├── permissions.py     # Order permissions
 │   └── urls.py            # Order routes
 ├── manage.py              # Django management script
 ├── Pipfile                # Python dependencies
@@ -45,13 +50,20 @@ server/
 
 #### User
 Custom user model extending AbstractUser with role-based access.
+- **Authentication**: Email-based (no username)
 - **Roles**: Admin, Tailor, School_Admin, Parent, Student
-- **Fields**: username, email, password, role
+- **Fields**: email (unique), password, role, first_name, last_name
+- **Manager**: CustomUserManager for email-based authentication
+- **Why**: Email is more user-friendly than username; role field enables RBAC
 
 #### Profile Models
 - **AdminProfile**: Admin user profile with phone number
 - **TailorProfile**: Tailor business details (shop_name, location, phone)
-- **SchoolAdminProfile**: Links school admin to a school
+#### SchoolAdminProfile
+- **Purpose**: Links school admin to a school
+- **Fields**: user, school (nullable), phone_number
+- **Why nullable school**: School admin is upgraded from Parent, creates school later
+- **Constraint**: OneToOne with User and School
 - **ParentProfile**: Parent contact information
 - **StudentProfile**: Student details (admission_number, DOB, gender, parent, school)
 
@@ -84,6 +96,148 @@ Custom user model extending AbstractUser with role-based access.
 - **Purpose**: Assigns approved orders to tailors
 - **Relations**: Links uniform_order, tailor, and school
 
+## Authentication & Authorization
+
+### JWT Authentication
+
+**Implementation**: Django REST Framework SimpleJWT
+
+**Custom Token Serializer** (`CustomTokenSerializer`):
+- Uses email instead of username for login
+- Returns access and refresh tokens
+- Custom validation for email-based authentication
+
+**Endpoints**:
+```
+POST /api/users/token/          # Login (get tokens)
+POST /api/users/token/refresh/  # Refresh access token
+```
+
+**Why JWT**: Stateless authentication, scalable, works well with React frontend
+
+### Role-Based Access Control (RBAC)
+
+**Custom Permission Classes**:
+
+#### users/permissions.py
+- `IsSystemAdmin` - Full system access
+- `IsTailor` - Tailor-only access
+- `IsParent` - Parent-only access  
+- `IsSchoolAdmin` - School admin-only access
+- `IsStudent` - Student-only access
+- `IsOwnerOrAdmin` - Object-level: users access own profiles
+
+#### schools/permissions.py
+- `IsSchoolAdminOrSystemAdmin` - School management
+- `IsParentOrSchoolAdmin` - View school applications
+- `CanApplyToSchool` - Parents apply, others view
+- `CanManageSchoolApplications` - School admins manage their school's applications
+
+#### tailors/permissions.py
+- `IsTailorOrSchoolAdmin` - Access tailor requests
+- `CanCreateTailorRequest` - Tailors create, others view
+- `CanManageTailorRequest` - School admins approve/reject
+
+#### uniform_orders/permissions.py
+- `CanCreateUniformOrder` - Parents create, others view
+- `CanViewUniformOrder` - Role-based viewing
+- `CanManageUniformAssignment` - School admins assign to tailors
+- `CanUpdateAssignmentStatus` - Tailors update their assignments
+
+**Why RBAC**: 
+- Data isolation (users only see their own data)
+- Security (prevents unauthorized access)
+- Scalability (easy to add new roles)
+- Compliance (audit trail of who accessed what)
+
+### Permission Implementation
+
+**ViewSet-level permissions**:
+```python
+class UserViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsSystemAdmin]
+```
+
+**Action-level permissions**:
+```python
+def get_permissions(self):
+    if self.action == 'create':
+        return [IsParent()]
+    return [IsAuthenticated()]
+```
+
+**Queryset filtering**:
+```python
+def get_queryset(self):
+    if self.request.user.role == 'Parent':
+        return Order.objects.filter(parent=self.request.user.parent_profile)
+    return Order.objects.all()
+```
+
+**Why this approach**: Combines permission checks with data filtering for complete security
+
+## User Registration & Role Management
+
+### Public Registration
+- Users can only register as **Parent** or **Tailor**
+- Automatically creates corresponding profile (ParentProfile or TailorProfile)
+- Email verification recommended for production
+
+### Role Upgrade (Parent → School Admin)
+
+**Endpoint**: `POST /api/users/{id}/upgrade_to_school_admin/`
+
+**Process**:
+1. System Admin selects a Parent user
+2. Changes user role from 'Parent' to 'School_Admin'
+3. Creates SchoolAdminProfile (school field is null initially)
+4. School Admin logs in and creates their school
+5. SchoolAdminProfile gets linked to the school
+
+**Why this flow**:
+- Security: Only System Admin can create School Admins
+- Flexibility: School Admin creates school with their own details
+- Data integrity: Parent profile remains for historical data
+- Access control: Role change automatically updates permissions
+
+**Access after upgrade**:
+- User loses Parent dashboard access (role != 'Parent')
+- User gains School Admin dashboard access (role == 'School_Admin')
+- Same login credentials (email/password)
+- Frontend routes based on role field in JWT token
+
+## Data Access Patterns
+
+### Schools
+- **View**: All authenticated users
+- **Create/Edit/Delete**: School Admin (own school) or System Admin
+
+### Parent School Applications  
+- **Create**: Parents
+- **View**: Parent (own), School Admin (their school), System Admin (all)
+- **Approve/Reject**: School Admin (their school), System Admin
+
+### Tailor School Requests
+- **Create**: Tailors
+- **View**: Tailor (own), School Admin (their school), System Admin (all)
+- **Approve/Reject**: School Admin (their school), System Admin
+
+### Uniform Orders
+- **Create**: Parents
+- **View**: Parent (own), School Admin (their school), System Admin (all)
+- **Approve/Reject**: School Admin (their school), System Admin
+
+### Uniform Assignments
+- **Create**: School Admin (their school), System Admin
+- **View**: School Admin (their school), Tailor (own), Parent (own orders), System Admin (all)
+- **Update Status**: Tailor (own), School Admin (their school), System Admin
+
+**Why these patterns**: 
+- Principle of least privilege
+- Data isolation between schools
+- Clear ownership and responsibility
+- Audit trail for compliance
+
 ## API Endpoints
 
 ### Base URL
@@ -91,24 +245,61 @@ Custom user model extending AbstractUser with role-based access.
 http://localhost:8000/api/
 ```
 
+### Authentication
+```
+POST /api/users/token/           # Login
+POST /api/users/token/refresh/   # Refresh token
+```
+
 ### Users
 ```
-/api/users/          # User management endpoints
+GET    /api/users/                           # List users (Admin only)
+POST   /api/users/                           # Create user
+GET    /api/users/{id}/                      # Get user details
+PATCH  /api/users/{id}/                      # Update user
+DELETE /api/users/{id}/                      # Delete user
+POST   /api/users/{id}/upgrade_to_school_admin/  # Upgrade parent to school admin
 ```
 
 ### Schools
 ```
-/api/schools/        # School management endpoints
+GET    /api/schools/                         # List all schools (authenticated)
+POST   /api/schools/                         # Create school (School Admin/Admin)
+GET    /api/schools/{id}/                    # Get school details
+PATCH  /api/schools/{id}/                    # Update school (owner/Admin)
+DELETE /api/schools/{id}/                    # Delete school (owner/Admin)
 ```
 
-### Tailors
+### Parent Applications
 ```
-/api/tailors/        # Tailor request endpoints
+GET    /api/parent-applications/             # List applications (filtered by role)
+POST   /api/parent-applications/             # Create application (Parent)
+GET    /api/parent-applications/{id}/        # Get application details
+PATCH  /api/parent-applications/{id}/        # Update status (School Admin)
+```
+
+### Tailor Requests
+```
+GET    /api/tailor-requests/                 # List requests (filtered by role)
+POST   /api/tailor-requests/                 # Create request (Tailor)
+GET    /api/tailor-requests/{id}/            # Get request details
+PATCH  /api/tailor-requests/{id}/            # Update status (School Admin)
 ```
 
 ### Uniform Orders
 ```
-/api/uniform_orders/ # Order management endpoints
+GET    /api/uniform-orders/                  # List orders (filtered by role)
+POST   /api/uniform-orders/                  # Create order (Parent)
+GET    /api/uniform-orders/{id}/             # Get order details
+PATCH  /api/uniform-orders/{id}/             # Update status (School Admin)
+```
+
+### Uniform Assignments
+```
+GET    /api/uniform-assignments/             # List assignments (filtered by role)
+POST   /api/uniform-assignments/             # Create assignment (School Admin)
+GET    /api/uniform-assignments/{id}/        # Get assignment details
+PATCH  /api/uniform-assignments/{id}/        # Update status (Tailor/School Admin)
 ```
 
 ## Setup Instructions
@@ -195,29 +386,104 @@ python manage.py migrate
 
 ## User Roles & Permissions
 
-### Admin
-- Full system access
+### System Admin
+- Full system access to all resources
 - Manage all users and data
+- Upgrade Parents to School Admins
+- View system-wide analytics
+- **Why**: Central authority for system management
 
 ### School Admin
-- Manage school information
-- Approve/reject parent applications
-- Approve/reject tailor requests
-- Assign orders to tailors
+- Manage their school information
+- Approve/reject parent applications to their school
+- Approve/reject tailor requests to their school
+- Approve/reject uniform orders for their school
+- Assign approved orders to tailors
+- View all data related to their school
+- **Why**: School autonomy while maintaining data isolation
 
 ### Parent
-- Register students
-- Submit uniform orders
-- Track order status
+- Register and manage students
+- Apply to schools for student enrollment
+- Submit uniform orders for students
+- Track order and assignment status
+- View only their own data
+- **Why**: Privacy and focused user experience
 
 ### Tailor
 - Apply to work with schools
-- View assigned orders
-- Update order status
+- View assigned orders from approved schools
+- Update order status (received, started, halfway, complete)
+- View only their own assignments
+- **Why**: Business privacy and focused workflow
 
 ### Student
 - View profile information
 - Linked to parent and school
+- Passive role (managed by parent)
+- **Why**: Students don't need active system access
+
+## Design Decisions & Rationale
+
+### Why Email-Based Authentication?
+- **User-friendly**: People remember emails better than usernames
+- **Unique identifier**: Email is naturally unique
+- **Communication**: Can send notifications to login email
+- **Industry standard**: Most modern apps use email login
+
+### Why Role-Based Access Control (RBAC)?
+- **Security**: Users only access what they need
+- **Scalability**: Easy to add new roles without changing code
+- **Compliance**: Clear audit trail of permissions
+- **Maintainability**: Centralized permission logic
+
+### Why JWT Tokens?
+- **Stateless**: No server-side session storage needed
+- **Scalable**: Works across multiple servers
+- **Mobile-friendly**: Easy to implement in mobile apps
+- **Frontend separation**: Clean API for React frontend
+
+### Why Separate Permission Files?
+- **Organization**: Each app manages its own permissions
+- **Reusability**: Permissions can be combined with `|` operator
+- **Maintainability**: Easy to find and update permissions
+- **Testing**: Isolated permission logic is easier to test
+
+### Why Queryset Filtering?
+- **Defense in depth**: Permissions + data filtering = double security
+- **Performance**: Database-level filtering is efficient
+- **Automatic**: Developers can't forget to filter data
+- **Consistent**: Same filtering logic across all views
+
+### Why Parent → School Admin Upgrade?
+- **Trust**: School admins are vetted (were parents first)
+- **Simplicity**: No separate school admin registration flow
+- **Flexibility**: System admin controls who becomes school admin
+- **Data continuity**: Parent history is preserved
+
+### Why Nullable School in SchoolAdminProfile?
+- **Workflow**: School admin needs to create school after upgrade
+- **Flexibility**: School admin can set up school with their details
+- **Validation**: Prevents dummy school data during upgrade
+- **User experience**: School admin controls their school information
+
+### Why ModelViewSet?
+- **Full CRUD**: Automatic endpoints for all operations
+- **DRY principle**: Less code to maintain
+- **Consistency**: Standard REST API patterns
+- **Extensibility**: Easy to add custom actions
+
+### Why Multiple Profile Models?
+- **Separation of concerns**: Each role has specific data
+- **Flexibility**: Easy to add role-specific fields
+- **Performance**: Only load relevant profile data
+- **Clarity**: Clear data structure for each role
+
+### Why OneToOne School in SchoolAdminProfile?
+- **Business rule**: One school admin per school
+- **Data integrity**: Prevents multiple admins for same school
+- **Simplicity**: Clear ownership model
+- **Scalability**: Can be changed to ForeignKey if needed
 
 ## Common Commands
 
@@ -312,13 +578,47 @@ python manage.py runserver 8001
 
 ## Future Enhancements
 
-- [ ] JWT authentication
-- [ ] Email notifications
-- [ ] Payment integration
-- [ ] File uploads for uniform designs
-- [ ] Real-time order tracking
-- [ ] Analytics dashboard
+- [ ] JWT token refresh automation
+- [ ] Email notifications for status changes
+- [ ] Payment integration for uniform orders
+- [ ] File uploads for uniform designs/measurements
+- [ ] Real-time order tracking with WebSockets
+- [ ] Analytics dashboard for System Admin
 - [ ] Mobile app API support
+- [ ] Multi-school support for School Admins
+- [ ] Tailor rating and review system
+- [ ] Automated assignment based on tailor availability
+- [ ] Bulk order processing
+- [ ] Export reports (PDF/Excel)
+- [ ] Two-factor authentication (2FA)
+- [ ] Password reset via email
+- [ ] User activity logs for audit
+
+## Architecture Decisions
+
+### Why Django REST Framework?
+- **Mature ecosystem**: Well-tested and documented
+- **Built-in features**: Serializers, viewsets, permissions
+- **Browsable API**: Easy testing during development
+- **Community**: Large community and third-party packages
+
+### Why SQLite for Development?
+- **Zero configuration**: Works out of the box
+- **Fast setup**: No database server needed
+- **Portable**: Database is a single file
+- **Easy reset**: Delete file to start fresh
+
+### Why Separate Apps?
+- **Modularity**: Each app has single responsibility
+- **Reusability**: Apps can be reused in other projects
+- **Team collaboration**: Different developers can work on different apps
+- **Testing**: Easier to test isolated functionality
+
+### Why Custom User Manager?
+- **Email authentication**: Override default username-based auth
+- **Superuser creation**: Custom logic for admin creation
+- **Validation**: Centralized user creation logic
+- **Consistency**: Same user creation flow everywhere
 
 ## Support
 
