@@ -1,11 +1,19 @@
+import { useEffect } from 'react';
+import { useParentStore } from '../../Stores/parent_stores';
+import EmptyState from '../../components/EmptyState';
+import { FaTshirt } from 'react-icons/fa';
+
 export default function UniformApplications() {
-  const applications = [
-    { id: 1, student: 'John Doe', school: 'Greenwood High School', status: 'Approved', date: '2025-01-15', tailorProgress: 'received', tailor: 'Mike Tailor' },
-    { id: 2, student: 'Jane Doe', school: 'Greenwood High School', status: 'Approved', date: '2025-01-10', tailorProgress: 'halfway', tailor: 'Sarah Tailor' },
-    { id: 3, student: 'Mike Doe', school: 'Sunrise Academy', status: 'Pending', date: '2025-01-18', tailorProgress: null, tailor: null },
-    { id: 4, student: 'John Doe', school: 'Greenwood High School', status: 'Rejected', date: '2025-01-05', tailorProgress: null, tailor: null },
-    { id: 5, student: 'Jane Doe', school: 'Greenwood High School', status: 'Approved', date: '2025-01-12', tailorProgress: 'complete', tailor: 'Mike Tailor' }
-  ];
+  const { orders, assignments, fetchOrders, fetchAssignments } = useParentStore();
+
+  useEffect(() => {
+    fetchOrders();
+    fetchAssignments();
+  }, [fetchOrders, fetchAssignments]);
+
+  const getAssignmentForOrder = (orderId) => {
+    return assignments.find(a => a.uniform_order?.id === orderId);
+  };
 
   const getTailorProgressBadge = (progress) => {
     if (!progress) return null;
@@ -32,22 +40,27 @@ export default function UniformApplications() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Approved':
+      case 'APPROVED':
         return 'bg-green-100 text-green-800';
-      case 'Pending':
+      case 'PENDING':
         return 'bg-yellow-100 text-yellow-800';
-      case 'Rejected':
+      case 'REJECTED':
         return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
+  const getStatusLabel = (status) => {
+    return status ? status.charAt(0) + status.slice(1).toLowerCase() : 'Unknown';
+  };
+
   return (
     <div>
       <h2 className="text-3xl font-bold mb-8 text-gray-900">Uniform Applications</h2>
       
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      {orders.length > 0 ? (
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
@@ -61,28 +74,40 @@ export default function UniformApplications() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {applications.map((app) => (
-              <tr key={app.id}>
-                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.student}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{app.school}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{app.date}</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(app.status)}`}>
-                    {app.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-600 font-bold">{app.tailor || '-'}</td>
-                <td className="px-6 py-4 text-sm">
-                  {app.tailorProgress ? getTailorProgressBadge(app.tailorProgress) : <span className="text-gray-400">-</span>}
-                </td>
-                <td className="px-6 py-4 text-sm">
-                  <button className="text-blue-700 hover:text-blue-800 font-medium">View</button>
-                </td>
-              </tr>
-            ))}
+            {orders.map((app) => {
+              const assignment = getAssignmentForOrder(app.id);
+              return (
+                <tr key={app.id}>
+                  <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.gender || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{app.school?.name || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{new Date(app.created_at).toLocaleDateString()}</td>
+                  <td className="px-6 py-4 text-sm">
+                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(app.status)}`}>
+                      {getStatusLabel(app.status)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600 font-bold">{assignment?.tailor?.shop_name || '-'}</td>
+                  <td className="px-6 py-4 text-sm">
+                    {assignment?.status ? getTailorProgressBadge(assignment.status) : <span className="text-gray-400">-</span>}
+                  </td>
+                  <td className="px-6 py-4 text-sm">
+                    <button className="text-blue-700 hover:text-blue-800 font-medium">View</button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-md">
+          <EmptyState
+            icon={<FaTshirt />}
+            title="No Uniform Applications"
+            message="You haven't submitted any uniform applications yet. Apply to schools first, then submit uniform orders."
+          />
+        </div>
+      )}
     </div>
   );
 }

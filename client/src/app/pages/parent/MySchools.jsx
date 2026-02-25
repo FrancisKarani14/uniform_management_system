@@ -1,17 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParentStore } from '../../Stores/parent_stores';
+import EmptyState from '../../components/EmptyState';
+import { FaSchool } from 'react-icons/fa';
 
 export default function MySchools() {
-  const schools = [
-    { id: 1, name: 'Greenwood High School', location: 'Nairobi', students: 2, status: 'Active' },
-    { id: 2, name: 'Sunrise Academy', location: 'Mombasa', students: 1, status: 'Active' }
-  ];
+  const { applications, students, fetchApplications, fetchStudents } = useParentStore();
+  
+  useEffect(() => {
+    fetchApplications();
+    fetchStudents();
+  }, [fetchApplications, fetchStudents]);
 
-  const allChildren = [
-    { id: 1, name: 'John Doe', grade: 'Grade 8', gender: 'Male' },
-    { id: 2, name: 'Jane Doe', grade: 'Grade 10', gender: 'Female' },
-    { id: 3, name: 'Mike Doe', grade: 'Grade 6', gender: 'Male' },
-    { id: 4, name: 'Sarah Doe', grade: 'Grade 5', gender: 'Female' }
-  ];
+  const approvedSchools = applications.filter(app => app.status === 'APPROVED');
+  const uniqueSchools = [...new Map(approvedSchools.map(app => [app.school?.id, app.school])).values()];
 
   const [showModal, setShowModal] = useState(false);
   const [selectedSchool, setSelectedSchool] = useState(null);
@@ -30,25 +31,31 @@ export default function MySchools() {
     );
   };
 
-  const handleEnroll = () => {
+  const handleEnroll = async () => {
+    // TODO: Implement enroll student API call
     alert(`Enrolled ${selectedChildren.length} child(ren) to ${selectedSchool.name}`);
     setShowModal(false);
     setSelectedChildren([]);
     setSelectedSchool(null);
   };
 
+  const getStudentCountForSchool = (schoolId) => {
+    return students.filter(s => s.school?.id === schoolId).length;
+  };
+
   return (
     <div>
       <h2 className="text-3xl font-bold mb-8 text-gray-900">My Schools</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {schools.map((school) => (
+      {uniqueSchools.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {uniqueSchools.map((school) => (
           <div key={school.id} className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-bold text-gray-900 mb-2">{school.name}</h3>
             <p className="text-gray-600 mb-1">Location: {school.location}</p>
-            <p className="text-gray-600 mb-1">Students Enrolled: {school.students}</p>
+            <p className="text-gray-600 mb-1">Students Enrolled: {getStudentCountForSchool(school.id)}</p>
             <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs mt-2">
-              {school.status}
+              Active
             </span>
             <button 
               onClick={() => handleEnrollClick(school)}
@@ -57,8 +64,17 @@ export default function MySchools() {
               Enroll Child
             </button>
           </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-md">
+          <EmptyState
+            icon={<FaSchool />}
+            title="No Approved Schools"
+            message="You don't have any approved school applications yet. Browse schools and apply to get started."
+          />
+        </div>
+      )}
 
       {/* Enrollment Modal */}
       {showModal && (
@@ -68,7 +84,7 @@ export default function MySchools() {
             <p className="text-gray-600 mb-6">Select children to enroll in {selectedSchool?.name}</p>
             
             <div className="space-y-3 mb-6">
-              {allChildren.map((child) => (
+              {students.map((child) => (
                 <label
                   key={child.id}
                   className="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer"
@@ -80,8 +96,8 @@ export default function MySchools() {
                     className="w-4 h-4 text-blue-700 rounded focus:ring-2 focus:ring-blue-700"
                   />
                   <div className="ml-3">
-                    <p className="font-medium text-gray-900">{child.name}</p>
-                    <p className="text-sm text-gray-600">{child.grade} • {child.gender}</p>
+                    <p className="font-medium text-gray-900">{child.user?.first_name} {child.user?.last_name}</p>
+                    <p className="text-sm text-gray-600">{child.admission_number} • {child.gender}</p>
                   </div>
                 </label>
               ))}

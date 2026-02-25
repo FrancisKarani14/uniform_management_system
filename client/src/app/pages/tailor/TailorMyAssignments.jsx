@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useTailorStore } from '../../Stores/tailor_stores';
+import EmptyState from '../../components/EmptyState';
+import { FaTshirt } from 'react-icons/fa';
 
 export default function TailorMyAssignments() {
-  const [assignments, setAssignments] = useState([
-    { id: 1, studentName: 'John Doe', school: 'Greenwood High School', uniformType: 'Full Set', status: 'received', dueDate: '2024-02-15', measurements: { chest: '36"', waist: '32"', height: '5\'8"', shoulder: '16"' } },
-    { id: 2, studentName: 'Jane Smith', school: 'Sunrise Academy', uniformType: 'Shirt & Trousers', status: 'started', dueDate: '2024-02-20', measurements: { chest: '34"', waist: '28"', height: '5\'4"', shoulder: '14"' } },
-    { id: 3, studentName: 'Mike Johnson', school: 'Greenwood High School', uniformType: 'Full Set', status: 'halfway', dueDate: '2024-02-18', measurements: { chest: '38"', waist: '34"', height: '5\'10"', shoulder: '17"' } },
-    { id: 4, studentName: 'Sarah Williams', school: 'Valley View School', uniformType: 'Dress', status: 'complete', dueDate: '2024-02-10', measurements: { chest: '32"', waist: '26"', height: '5\'3"', shoulder: '13"' } },
-    { id: 5, studentName: 'Tom Brown', school: 'Sunrise Academy', uniformType: 'Full Set', status: 'pending', dueDate: '2024-02-25', measurements: { chest: '40"', waist: '36"', height: '6\'0"', shoulder: '18"' } }
-  ]);
+  const { assignments, fetchAssignments, updateAssignmentStatus } = useTailorStore();
+
+  useEffect(() => {
+    fetchAssignments();
+  }, [fetchAssignments]);
 
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
@@ -17,11 +18,13 @@ export default function TailorMyAssignments() {
     setShowDetailsModal(true);
   };
 
-  const updateStatus = (newStatus) => {
-    setAssignments(assignments.map(a => 
-      a.id === selectedAssignment.id ? { ...a, status: newStatus } : a
-    ));
-    setSelectedAssignment({ ...selectedAssignment, status: newStatus });
+  const updateStatus = async (newStatus) => {
+    try {
+      await updateAssignmentStatus(selectedAssignment.id, newStatus);
+      setSelectedAssignment({ ...selectedAssignment, status: newStatus });
+    } catch (error) {
+      console.error('Failed to update status:', error);
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -50,7 +53,8 @@ export default function TailorMyAssignments() {
     <div>
       <h2 className="text-3xl font-bold mb-8 text-gray-900">My Assignments</h2>
       
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      {assignments.length > 0 ? (
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
@@ -65,11 +69,11 @@ export default function TailorMyAssignments() {
           <tbody className="divide-y divide-gray-200">
             {assignments.map((assignment) => (
               <tr key={assignment.id}>
-                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{assignment.studentName}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{assignment.school}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{assignment.uniformType}</td>
-                <td className="px-6 py-4 text-sm">{getStatusBadge(assignment.status)}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{assignment.dueDate}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{assignment.uniform_order?.student || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{assignment.school?.name || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{assignment.uniform_order?.gender || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm">{getStatusBadge(assignment.status || 'pending')}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{new Date(assignment.created_at).toLocaleDateString()}</td>
                 <td className="px-6 py-4 text-sm">
                   <button
                     onClick={() => handleViewDetails(assignment)}
@@ -83,6 +87,15 @@ export default function TailorMyAssignments() {
           </tbody>
         </table>
       </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-md">
+          <EmptyState
+            icon={<FaTshirt />}
+            title="No Assignments Yet"
+            message="You don't have any uniform assignments yet. Make sure you're approved by schools to start receiving assignments."
+          />
+        </div>
+      )}
 
       {/* Details Modal */}
       {showDetailsModal && selectedAssignment && (
@@ -93,23 +106,23 @@ export default function TailorMyAssignments() {
             <div className="space-y-4 mb-6">
               <div>
                 <span className="font-bold text-gray-700">Student:</span>
-                <span className="ml-2 text-gray-600">{selectedAssignment.studentName}</span>
+                <span className="ml-2 text-gray-600">{selectedAssignment.uniform_order?.student || 'N/A'}</span>
               </div>
               <div>
                 <span className="font-bold text-gray-700">School:</span>
-                <span className="ml-2 text-gray-600">{selectedAssignment.school}</span>
+                <span className="ml-2 text-gray-600">{selectedAssignment.school?.name || 'N/A'}</span>
               </div>
               <div>
                 <span className="font-bold text-gray-700">Uniform Type:</span>
-                <span className="ml-2 text-gray-600">{selectedAssignment.uniformType}</span>
+                <span className="ml-2 text-gray-600">{selectedAssignment.uniform_order?.gender || 'N/A'}</span>
               </div>
               <div>
-                <span className="font-bold text-gray-700">Due Date:</span>
-                <span className="ml-2 text-gray-600">{selectedAssignment.dueDate}</span>
+                <span className="font-bold text-gray-700">Assignment Date:</span>
+                <span className="ml-2 text-gray-600">{new Date(selectedAssignment.created_at).toLocaleDateString()}</span>
               </div>
               <div>
                 <span className="font-bold text-gray-700">Current Status:</span>
-                <span className="ml-2">{getStatusBadge(selectedAssignment.status)}</span>
+                <span className="ml-2">{getStatusBadge(selectedAssignment.status || 'pending')}</span>
               </div>
             </div>
 
@@ -117,20 +130,20 @@ export default function TailorMyAssignments() {
               <h4 className="font-bold text-gray-700 mb-3">Measurements:</h4>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <span className="text-sm text-gray-600">Chest:</span>
-                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.measurements.chest}</span>
+                  <span className="text-sm text-gray-600">Shirt:</span>
+                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.uniform_order?.shirt_size || 'N/A'}</span>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-600">Waist:</span>
-                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.measurements.waist}</span>
+                  <span className="text-sm text-gray-600">Trouser:</span>
+                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.uniform_order?.trouser_size || 'N/A'}</span>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-600">Height:</span>
-                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.measurements.height}</span>
+                  <span className="text-sm text-gray-600">Shoes:</span>
+                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.uniform_order?.shoes_size || 'N/A'}</span>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-600">Shoulder:</span>
-                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.measurements.shoulder}</span>
+                  <span className="text-sm text-gray-600">Sweater:</span>
+                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.uniform_order?.sweater_size || 'N/A'}</span>
                 </div>
               </div>
             </div>

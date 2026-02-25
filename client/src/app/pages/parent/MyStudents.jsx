@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParentStore } from '../../Stores/parent_stores';
+import EmptyState from '../../components/EmptyState';
+import { FaUserGraduate } from 'react-icons/fa';
 
 export default function MyStudents() {
-  const [students, setStudents] = useState([
-    { id: 1, name: 'John Doe', school: 'Greenwood High School', grade: 'Grade 8', gender: 'Male' },
-    { id: 2, name: 'Jane Doe', school: 'Greenwood High School', grade: 'Grade 10', gender: 'Female' },
-    { id: 3, name: 'Mike Doe', school: 'Sunrise Academy', grade: 'Grade 6', gender: 'Male' }
-  ]);
+  const { students, fetchStudents } = useParentStore();
+  
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -14,16 +17,9 @@ export default function MyStudents() {
     dateOfBirth: ''
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newStudent = {
-      id: students.length + 1,
-      name: formData.name,
-      school: 'Not Enrolled',
-      grade: formData.grade,
-      gender: formData.gender
-    };
-    setStudents([...students, newStudent]);
+    // TODO: Implement create student API call
     setShowModal(false);
     setFormData({ name: '', gender: '', grade: '', dateOfBirth: '' });
   };
@@ -40,18 +36,31 @@ export default function MyStudents() {
         </button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {students.map((student) => (
-          <div key={student.id} className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">{student.name}</h3>
-            <p className="text-gray-600 mb-1">{student.school}</p>
-            <p className="text-gray-500 text-sm">{student.grade}</p>
-            <button className="mt-4 w-full py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition-all">
-              View Details
-            </button>
-          </div>
-        ))}
-      </div>
+      {students.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {students.map((student) => (
+            <div key={student.id} className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{student.user?.first_name} {student.user?.last_name}</h3>
+              <p className="text-gray-600 mb-1">{student.school?.name || 'Not Enrolled'}</p>
+              <p className="text-gray-500 text-sm">{student.admission_number}</p>
+              <p className="text-gray-500 text-sm">{student.gender}</p>
+              <button className="mt-4 w-full py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition-all">
+                View Details
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-md">
+          <EmptyState
+            icon={<FaUserGraduate />}
+            title="No Students Added"
+            message="You haven't added any students yet. Click the button above to add your first child."
+            actionLabel="Add Child"
+            onAction={() => setShowModal(true)}
+          />
+        </div>
+      )}
 
       {/* Modal */}
       {showModal && (
