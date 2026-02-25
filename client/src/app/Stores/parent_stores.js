@@ -16,7 +16,8 @@ export const useParentStore = create((set) => ({
       const response = await API.get('/schools/schools/');
       set({ schools: response.data, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      console.error('Failed to fetch schools:', error.response?.data || error.message);
+      set({ error: error.response?.data?.detail || error.message, loading: false, schools: [] });
     }
   },
 
@@ -26,7 +27,8 @@ export const useParentStore = create((set) => ({
       const response = await API.get('/users/student_profiles/');
       set({ students: response.data, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      console.error('Failed to fetch students:', error.response?.data || error.message);
+      set({ error: error.response?.data?.detail || error.message, loading: false, students: [] });
     }
   },
 
@@ -36,7 +38,8 @@ export const useParentStore = create((set) => ({
       const response = await API.get('/schools/parent_school_applications/');
       set({ applications: response.data, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      console.error('Failed to fetch applications:', error.response?.data || error.message);
+      set({ error: error.response?.data?.detail || error.message, loading: false, applications: [] });
     }
   },
 
@@ -46,7 +49,8 @@ export const useParentStore = create((set) => ({
       const response = await API.get('/uniform_orders/uniform_orders/');
       set({ orders: response.data, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      console.error('Failed to fetch orders:', error.response?.data || error.message);
+      set({ error: error.response?.data?.detail || error.message, loading: false, orders: [] });
     }
   },
 
@@ -56,7 +60,8 @@ export const useParentStore = create((set) => ({
       const response = await API.get('/uniform_orders/uniform_assignments/');
       set({ assignments: response.data, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      console.error('Failed to fetch assignments:', error.response?.data || error.message);
+      set({ error: error.response?.data?.detail || error.message, loading: false, assignments: [] });
     }
   },
 

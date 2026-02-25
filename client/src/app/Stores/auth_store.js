@@ -39,4 +39,16 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
+
+  getCurrentUser: async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return null;
+    
+    try {
+      const response = await API.get('/users/users/me/');
+      return response.data;
+    } catch (error) {
+      return null;
+    }
+  },
 }));

@@ -31,15 +31,13 @@ export const useAdminStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await API.post(`/users/users/${userId}/upgrade_to_school_admin/`);
-      set((state) => ({
-        users: state.users.map(user => 
-          user.id === userId ? { ...user, role: 'School_Admin' } : user
-        ),
-        loading: false
-      }));
+      await API.get('/users/users/').then(res => {
+        set({ users: res.data, loading: false });
+      });
       return response.data;
     } catch (error) {
-      set({ error: error.message, loading: false });
+      console.error('Upgrade failed:', error.response?.data || error.message);
+      set({ error: error.response?.data?.error || error.message, loading: false });
       throw error;
     }
   },

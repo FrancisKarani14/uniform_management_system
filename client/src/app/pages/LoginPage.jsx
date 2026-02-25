@@ -1,9 +1,13 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { useAuthStore } from '../Stores/auth_store';
+import API from '../Api/Api';
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+  const { login } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -16,7 +20,7 @@ export default function LoginPage() {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
-  const handleEmailLogin = (e) => {
+  const handleEmailLogin = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -31,7 +35,22 @@ export default function LoginPage() {
       return;
     }
 
-    setSuccess('Login successful!');
+    try {
+      await login(email, password);
+      const userResponse = await API.get('/users/users/me/');
+      const userRole = userResponse.data.role;
+      
+      const roleRoutes = {
+        'Admin': '/admin-dashboard',
+        'Parent': '/parent-dashboard',
+        'School_Admin': '/school-admin-dashboard',
+        'Tailor': '/tailor-dashboard'
+      };
+      
+      navigate(roleRoutes[userRole] || '/parent-dashboard');
+    } catch (error) {
+      setError(error.response?.data?.detail || 'Login failed. Please check your credentials.');
+    }
   };
 
   const handleMagicLink = (e) => {

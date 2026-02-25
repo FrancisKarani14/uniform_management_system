@@ -3,7 +3,7 @@ import { FaCrown } from 'react-icons/fa';
 import { useAdminStore } from '../../Stores/admin_stores';
 
 export default function UserManagement() {
-  const { users, fetchUsers, upgradeToSchoolAdmin } = useAdminStore();
+  const { users, fetchUsers, upgradeToSchoolAdmin, error: storeError } = useAdminStore();
   
   useEffect(() => {
     fetchUsers();
@@ -15,6 +15,7 @@ export default function UserManagement() {
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [userToUpgrade, setUserToUpgrade] = useState(null);
+  const [error, setError] = useState('');
 
   const handleUpgradeClick = (user) => {
     setUserToUpgrade(user);
@@ -22,11 +23,13 @@ export default function UserManagement() {
   };
 
   const confirmUpgrade = async () => {
+    setError('');
     try {
       await upgradeToSchoolAdmin(userToUpgrade.id);
       setShowConfirm(false);
       setUserToUpgrade(null);
     } catch (error) {
+      setError(error.response?.data?.error || 'Failed to upgrade user');
       console.error('Failed to upgrade user:', error);
     }
   };
@@ -34,6 +37,12 @@ export default function UserManagement() {
   return (
     <div>
       <h2 className="text-3xl font-bold mb-8 text-gray-900">User Management</h2>
+      
+      {error && (
+        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
       
       {/* Parents Section */}
       <div className="mb-8">
