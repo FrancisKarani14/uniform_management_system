@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AiOutlineDelete } from 'react-icons/ai';
+import { useAdminStore } from '../../Stores/admin_stores';
+import EmptyState from '../../components/EmptyState';
+import { FaSchool } from 'react-icons/fa';
 
 export default function AdminSchools() {
-  const [schools, setSchools] = useState([
-    { id: 1, name: 'Greenwood High School', location: 'Nairobi', students: 450, admin: 'John Admin' },
-    { id: 2, name: 'Sunrise Academy', location: 'Mombasa', students: 320, admin: 'Sarah Admin' },
-    { id: 3, name: 'Valley View School', location: 'Kisumu', students: 280, admin: 'Mike Admin' },
-    { id: 4, name: 'Hilltop Secondary', location: 'Nakuru', students: 510, admin: 'Jane Admin' },
-    { id: 5, name: 'Riverside Primary', location: 'Eldoret', students: 190, admin: 'Tom Admin' }
-  ]);
+  const { schools, fetchSchools, deleteSchool } = useAdminStore();
+  
+  useEffect(() => {
+    fetchSchools();
+  }, [fetchSchools]);
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [schoolToDelete, setSchoolToDelete] = useState(null);
@@ -18,17 +19,22 @@ export default function AdminSchools() {
     setShowConfirm(true);
   };
 
-  const confirmDelete = () => {
-    setSchools(schools.filter(school => school.id !== schoolToDelete.id));
-    setShowConfirm(false);
-    setSchoolToDelete(null);
+  const confirmDelete = async () => {
+    try {
+      await deleteSchool(schoolToDelete.id);
+      setShowConfirm(false);
+      setSchoolToDelete(null);
+    } catch (error) {
+      console.error('Failed to delete school:', error);
+    }
   };
 
   return (
     <div>
       <h2 className="text-3xl font-bold mb-8 text-gray-900">Schools Management</h2>
       
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      {schools.length > 0 ? (
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
@@ -44,8 +50,8 @@ export default function AdminSchools() {
               <tr key={school.id}>
                 <td className="px-6 py-4 text-sm text-gray-900 font-bold">{school.name}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{school.location}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{school.students}</td>
-                <td className="px-6 py-4 text-sm text-gray-600 font-bold">{school.admin}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{school.students?.length || 0}</td>
+                <td className="px-6 py-4 text-sm text-gray-600 font-bold">{school.school_admin_profile?.user?.email || 'N/A'}</td>
                 <td className="px-6 py-4 text-sm">
                   <button 
                     onClick={() => handleDeleteClick(school)}
@@ -60,6 +66,15 @@ export default function AdminSchools() {
           </tbody>
         </table>
       </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-md">
+          <EmptyState
+            icon={<FaSchool />}
+            title="No Schools in System"
+            message="There are currently no schools registered in the system. School admins need to create their schools first."
+          />
+        </div>
+      )}
 
       {/* Confirmation Modal */}
       {showConfirm && (

@@ -1,17 +1,28 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useTailorStore } from '../../Stores/tailor_stores';
+import EmptyState from '../../components/EmptyState';
+import { FaSchool } from 'react-icons/fa';
 
 export default function TailorMySchools() {
-  const [schools] = useState([
-    { id: 1, name: 'Greenwood High School', location: 'Nairobi', students: 450, assignmentsCount: 8 },
-    { id: 2, name: 'Sunrise Academy', location: 'Mombasa', students: 320, assignmentsCount: 5 },
-    { id: 3, name: 'Valley View School', location: 'Kisumu', students: 280, assignmentsCount: 5 }
-  ]);
+  const { applications, assignments, fetchApplications, fetchAssignments } = useTailorStore();
+
+  useEffect(() => {
+    fetchApplications();
+    fetchAssignments();
+  }, [fetchApplications, fetchAssignments]);
+
+  const approvedSchools = applications.filter(app => app.status === 'APPROVED');
+
+  const getAssignmentCountForSchool = (schoolId) => {
+    return assignments.filter(a => a.school?.id === schoolId).length;
+  };
 
   return (
     <div>
       <h2 className="text-3xl font-bold mb-8 text-gray-900">My Schools</h2>
       
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      {approvedSchools.length > 0 ? (
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
@@ -22,17 +33,26 @@ export default function TailorMySchools() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {schools.map((school) => (
-              <tr key={school.id}>
-                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{school.name}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{school.location}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{school.students}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{school.assignmentsCount}</td>
+            {approvedSchools.map((app) => (
+              <tr key={app.id}>
+                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.school?.name || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{app.school?.location || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{app.school?.students?.length || 0}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{getAssignmentCountForSchool(app.school?.id)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-md">
+          <EmptyState
+            icon={<FaSchool />}
+            title="No Approved Schools"
+            message="You don't have any approved school applications yet. Browse schools and apply to start receiving assignments."
+          />
+        </div>
+      )}
     </div>
   );
 }

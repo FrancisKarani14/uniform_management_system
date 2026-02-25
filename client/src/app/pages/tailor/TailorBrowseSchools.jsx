@@ -1,13 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useTailorStore } from '../../Stores/tailor_stores';
 
 export default function TailorBrowseSchools() {
-  const [schools] = useState([
-    { id: 1, name: 'Greenwood High School', location: 'Nairobi', students: 450, status: 'approved' },
-    { id: 2, name: 'Sunrise Academy', location: 'Mombasa', students: 320, status: 'pending' },
-    { id: 3, name: 'Valley View School', location: 'Kisumu', students: 280, status: null },
-    { id: 4, name: 'Hilltop Secondary', location: 'Nakuru', students: 510, status: null },
-    { id: 5, name: 'Riverside Primary', location: 'Eldoret', students: 190, status: 'rejected' }
-  ]);
+  const { schools, applications, fetchSchools, fetchApplications, applyToSchool } = useTailorStore();
+  
+  useEffect(() => {
+    fetchSchools();
+    fetchApplications();
+  }, [fetchSchools, fetchApplications]);
+
+  const getApplicationStatus = (schoolId) => {
+    const app = applications.find(a => a.school === schoolId);
+    return app ? app.status : null;
+  };
 
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [selectedSchool, setSelectedSchool] = useState(null);
@@ -18,11 +23,15 @@ export default function TailorBrowseSchools() {
     setShowApplyModal(true);
   };
 
-  const submitApplication = () => {
-    console.log('Applying to:', selectedSchool.name, 'Address:', address);
-    setShowApplyModal(false);
-    setSelectedSchool(null);
-    setAddress('');
+  const submitApplication = async () => {
+    try {
+      await applyToSchool({ school: selectedSchool.id });
+      setShowApplyModal(false);
+      setSelectedSchool(null);
+      setAddress('');
+    } catch (error) {
+      console.error('Failed to apply:', error);
+    }
   };
 
   return (
@@ -30,37 +39,40 @@ export default function TailorBrowseSchools() {
       <h2 className="text-3xl font-bold mb-8 text-gray-900">Browse Schools</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {schools.map((school) => (
-          <div key={school.id} className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">{school.name}</h3>
-            <p className="text-gray-600 mb-1">Location: {school.location}</p>
-            <p className="text-gray-600 mb-4">Students: {school.students}</p>
-            
-            {school.status === 'approved' && (
-              <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                Approved
-              </span>
-            )}
-            {school.status === 'pending' && (
-              <span className="inline-block px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium">
-                Pending
-              </span>
-            )}
-            {school.status === 'rejected' && (
-              <span className="inline-block px-3 py-1 bg-red-100 text-red-600 rounded-full text-sm font-medium">
-                Rejected
-              </span>
-            )}
-            {!school.status && (
-              <button
-                onClick={() => handleApply(school)}
-                className="w-full px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition-all"
-              >
-                Apply
-              </button>
-            )}
-          </div>
-        ))}
+        {schools.map((school) => {
+          const appStatus = getApplicationStatus(school.id);
+          return (
+            <div key={school.id} className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{school.name}</h3>
+              <p className="text-gray-600 mb-1">Location: {school.location}</p>
+              <p className="text-gray-600 mb-4">Students: {school.students?.length || 0}</p>
+              
+              {appStatus === 'APPROVED' && (
+                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                  Approved
+                </span>
+              )}
+              {appStatus === 'PENDING' && (
+                <span className="inline-block px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium">
+                  Pending
+                </span>
+              )}
+              {appStatus === 'REJECTED' && (
+                <span className="inline-block px-3 py-1 bg-red-100 text-red-600 rounded-full text-sm font-medium">
+                  Rejected
+                </span>
+              )}
+              {!appStatus && (
+                <button
+                  onClick={() => handleApply(school)}
+                  className="w-full px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition-all"
+                >
+                  Apply
+                </button>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Apply Modal */}

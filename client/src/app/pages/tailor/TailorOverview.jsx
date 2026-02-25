@@ -1,18 +1,20 @@
-export default function TailorOverview() {
-  const stats = {
-    completedAssignments: 12,
-    totalAssignments: 18,
-    approvedSchools: 3,
-    appliedSchools: 5
-  };
+import { useEffect } from 'react';
+import { useTailorStore } from '../../Stores/tailor_stores';
 
-  const recentAssignments = [
-    { id: 1, studentName: 'John Doe', school: 'Greenwood High School', uniformType: 'Full Set', status: 'received', dueDate: '2024-02-15' },
-    { id: 2, studentName: 'Jane Smith', school: 'Sunrise Academy', uniformType: 'Shirt & Trousers', status: 'started', dueDate: '2024-02-20' },
-    { id: 3, studentName: 'Mike Johnson', school: 'Greenwood High School', uniformType: 'Full Set', status: 'halfway', dueDate: '2024-02-18' },
-    { id: 4, studentName: 'Sarah Williams', school: 'Valley View School', uniformType: 'Dress', status: 'complete', dueDate: '2024-02-10' },
-    { id: 5, studentName: 'Tom Brown', school: 'Sunrise Academy', uniformType: 'Full Set', status: 'started', dueDate: '2024-02-25' }
-  ];
+export default function TailorOverview() {
+  const { assignments, applications, fetchAssignments, fetchApplications } = useTailorStore();
+
+  useEffect(() => {
+    fetchAssignments();
+    fetchApplications();
+  }, [fetchAssignments, fetchApplications]);
+
+  const stats = {
+    completedAssignments: assignments.filter(a => a.status === 'complete').length,
+    totalAssignments: assignments.length,
+    approvedSchools: applications.filter(a => a.status === 'APPROVED').length,
+    appliedSchools: applications.length
+  };
 
   const getStatusBadge = (status) => {
     const badges = {
@@ -76,13 +78,13 @@ export default function TailorOverview() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {recentAssignments.slice(0, 4).map((assignment) => (
+              {assignments.slice(0, 4).map((assignment) => (
                 <tr key={assignment.id}>
-                  <td className="px-6 py-4 text-sm text-gray-900 font-bold">{assignment.studentName}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{assignment.school}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{assignment.uniformType}</td>
-                  <td className="px-6 py-4 text-sm">{getStatusBadge(assignment.status)}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{assignment.dueDate}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900 font-bold">{assignment.uniform_order?.student || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{assignment.school?.name || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{assignment.uniform_order?.gender || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm">{getStatusBadge(assignment.status || 'pending')}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{new Date(assignment.created_at).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>

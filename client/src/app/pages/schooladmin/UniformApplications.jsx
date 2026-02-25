@@ -1,43 +1,57 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSchoolAdminStore } from '../../Stores/schooladmin_stores';
+import { useTailorStore } from '../../Stores/tailor_stores';
 
 export default function UniformApplications() {
-  const [applications, setApplications] = useState([
-    { id: 1, parent: 'Alice Johnson', student: 'John Doe', shirt: 'M', trouser: '32', shoes: '42', status: 'Pending', date: '2025-01-20' },
-    { id: 2, parent: 'Bob Smith', student: 'Jane Smith', shirt: 'S', trouser: '28', shoes: '38', status: 'Approved', date: '2025-01-19' },
-    { id: 3, parent: 'Carol Williams', student: 'Mike Williams', shirt: 'L', trouser: '34', shoes: '44', status: 'Approved', date: '2025-01-18' }
-  ]);
+  const { orders, fetchOrders, updateOrderStatus, createAssignment } = useSchoolAdminStore();
+  const { applications: tailorApps, fetchApplications: fetchTailorApps } = useTailorStore();
+  
+  useEffect(() => {
+    fetchOrders();
+    fetchTailorApps();
+  }, [fetchOrders, fetchTailorApps]);
 
-  const tailors = [
-    { id: 1, name: 'Frank Taylor' },
-    { id: 2, name: 'Grace Miller' },
-    { id: 3, name: 'Henry Wilson' }
-  ];
+  const approvedTailors = tailorApps.filter(app => app.status === 'APPROVED');
 
   const [showDetails, setShowDetails] = useState(false);
   const [showAssign, setShowAssign] = useState(false);
   const [selectedApp, setSelectedApp] = useState(null);
   const [selectedTailor, setSelectedTailor] = useState('');
 
-  const handleAction = (id, action) => {
-    setApplications(applications.map(app =>
-      app.id === id ? { ...app, status: action } : app
-    ));
-    setShowDetails(false);
+  const handleAction = async (id, action) => {
+    try {
+      await updateOrderStatus(id, action.toUpperCase());
+      setShowDetails(false);
+    } catch (error) {
+      console.error('Failed to update order:', error);
+    }
   };
 
-  const handleAssign = () => {
-    alert(`Assigned to ${tailors.find(t => t.id === parseInt(selectedTailor))?.name}`);
-    setShowAssign(false);
-    setSelectedTailor('');
+  const handleAssign = async () => {
+    try {
+      await createAssignment({
+        uniform_order: selectedApp.id,
+        tailor: parseInt(selectedTailor),
+        school: selectedApp.school
+      });
+      setShowAssign(false);
+      setSelectedTailor('');
+    } catch (error) {
+      console.error('Failed to assign tailor:', error);
+    }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Approved': return 'bg-green-100 text-green-800';
-      case 'Rejected': return 'bg-red-100 text-red-800';
-      case 'Pending': return 'bg-yellow-100 text-yellow-800';
+      case 'APPROVED': return 'bg-green-100 text-green-800';
+      case 'REJECTED': return 'bg-red-100 text-red-800';
+      case 'PENDING': return 'bg-yellow-100 text-yellow-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const getStatusLabel = (status) => {
+    return status ? status.charAt(0) + status.slice(1).toLowerCase() : 'Unknown';
   };
 
   return (
@@ -54,12 +68,12 @@ export default function UniformApplications() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {applications.map((app) => (
+            {orders.map((app) => (
               <tr key={app.id}>
-                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.parent}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.parent?.user?.email || 'N/A'}</td>
                 <td className="px-6 py-4 text-sm">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(app.status)}`}>
-                    {app.status}
+                    {getStatusLabel(app.status)}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm">
@@ -73,7 +87,7 @@ export default function UniformApplications() {
                     >
                       View Details
                     </button>
-                    {app.status === 'Approved' && (
+                    {app.status === 'APPROVED' && (
                       <button
                         onClick={() => {
                           setSelectedApp(app);
@@ -98,15 +112,18 @@ export default function UniformApplications() {
           <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl border border-gray-200">
             <h3 className="text-2xl font-bold mb-6 text-gray-900">Application Details</h3>
             <div className="space-y-3 mb-6">
-              <div><span className="font-bold">Parent:</span> {selectedApp.parent}</div>
-              <div><span className="font-bold">Student:</span> {selectedApp.student}</div>
-              <div><span className="font-bold">Shirt Size:</span> {selectedApp.shirt}</div>
-              <div><span className="font-bold">Trouser Size:</span> {selectedApp.trouser}</div>
-              <div><span className="font-bold">Shoe Size:</span> {selectedApp.shoes}</div>
-              <div><span className="font-bold">Date Applied:</span> {selectedApp.date}</div>
-              <div><span className="font-bold">Status:</span> <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedApp.status)}`}>{selectedApp.status}</span></div>
+              <div><span className="font-bold">Parent:</span> {selectedApp.parent?.user?.email || 'N/A'}</div>
+              <div><span className="font-bold">Gender:</span> {selectedApp.gender}</div>
+              <div><span className="font-bold">Shirt Size:</span> {selectedApp.shirt_size}</div>
+              <div><span className="font-bold">Trouser Size:</span> {selectedApp.trouser_size}</div>
+              <div><span className="font-bold">Shoe Size:</span> {selectedApp.shoes_size}</div>
+              <div><span className="font-bold">Blouse Size:</span> {selectedApp.blouse_size}</div>
+              <div><span className="font-bold">Skirt Size:</span> {selectedApp.skirt_size}</div>
+              <div><span className="font-bold">Sweater Size:</span> {selectedApp.sweater_size}</div>
+              <div><span className="font-bold">Date Applied:</span> {new Date(selectedApp.created_at).toLocaleDateString()}</div>
+              <div><span className="font-bold">Status:</span> <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedApp.status)}`}>{getStatusLabel(selectedApp.status)}</span></div>
             </div>
-            {selectedApp.status === 'Pending' && (
+            {selectedApp.status === 'PENDING' && (
               <div className="flex gap-3 mb-3">
                 <button
                   onClick={() => handleAction(selectedApp.id, 'Approved')}
@@ -137,15 +154,15 @@ export default function UniformApplications() {
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl border border-gray-200">
             <h3 className="text-2xl font-bold mb-6 text-gray-900">Assign Tailor</h3>
-            <p className="mb-4">Assign uniform application for <strong>{selectedApp.student}</strong> to a tailor:</p>
+            <p className="mb-4">Assign uniform application for <strong>{selectedApp.parent?.user?.email}</strong> to a tailor:</p>
             <select
               value={selectedTailor}
               onChange={(e) => setSelectedTailor(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-md mb-6 focus:ring-2 focus:ring-blue-700"
             >
               <option value="">Select Tailor</option>
-              {tailors.map(tailor => (
-                <option key={tailor.id} value={tailor.id}>{tailor.name}</option>
+              {approvedTailors.map(tailor => (
+                <option key={tailor.tailor} value={tailor.tailor}>{tailor.tailor?.shop_name || `Tailor ${tailor.tailor}`}</option>
               ))}
             </select>
             <div className="flex gap-3">

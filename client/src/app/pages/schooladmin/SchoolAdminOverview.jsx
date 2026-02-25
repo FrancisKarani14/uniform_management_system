@@ -1,19 +1,23 @@
-export default function SchoolAdminOverview() {
-  const stats = {
-    parentApplications: 12,
-    tailorApplications: 5,
-    uniformApplications: 28,
-    approvedUniformApplications: 15,
-    assignedUniformApplications: 10
-  };
+import { useEffect } from 'react';
+import { useSchoolAdminStore } from '../../Stores/schooladmin_stores';
 
-  const recentAssignments = [
-    { id: 1, student: 'John Doe', parent: 'Alice Johnson', tailor: 'Mike Tailor', uniformType: 'Full Set', status: 'received', dueDate: '2024-02-15' },
-    { id: 2, student: 'Jane Smith', parent: 'Bob Smith', tailor: 'Sarah Tailor', uniformType: 'Shirt & Trousers', status: 'started', dueDate: '2024-02-20' },
-    { id: 3, student: 'Mike Johnson', parent: 'Carol Williams', tailor: 'Mike Tailor', uniformType: 'Full Set', status: 'halfway', dueDate: '2024-02-18' },
-    { id: 4, student: 'Sarah Williams', parent: 'David Brown', tailor: 'Sarah Tailor', uniformType: 'Dress', status: 'complete', dueDate: '2024-02-10' },
-    { id: 5, student: 'Tom Brown', parent: 'Emma Davis', tailor: 'Mike Tailor', uniformType: 'Full Set', status: 'started', dueDate: '2024-02-25' }
-  ];
+export default function SchoolAdminOverview() {
+  const { parentApplications, tailorApplications, orders, assignments, fetchParentApplications, fetchTailorApplications, fetchOrders, fetchAssignments } = useSchoolAdminStore();
+
+  useEffect(() => {
+    fetchParentApplications();
+    fetchTailorApplications();
+    fetchOrders();
+    fetchAssignments();
+  }, [fetchParentApplications, fetchTailorApplications, fetchOrders, fetchAssignments]);
+
+  const stats = {
+    parentApplications: parentApplications.length,
+    tailorApplications: tailorApplications.length,
+    uniformApplications: orders.length,
+    approvedUniformApplications: orders.filter(o => o.status === 'APPROVED').length,
+    assignedUniformApplications: assignments.length
+  };
 
   const getStatusBadge = (status) => {
     const badges = {
@@ -83,14 +87,14 @@ export default function SchoolAdminOverview() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {recentAssignments.slice(0, 4).map((assignment) => (
+              {assignments.slice(0, 4).map((assignment) => (
                 <tr key={assignment.id}>
-                  <td className="px-6 py-4 text-sm text-gray-900 font-bold">{assignment.student}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600 font-bold">{assignment.parent}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600 font-bold">{assignment.tailor}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{assignment.uniformType}</td>
-                  <td className="px-6 py-4 text-sm">{getStatusBadge(assignment.status)}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{assignment.dueDate}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900 font-bold">{assignment.uniform_order?.student || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600 font-bold">{assignment.uniform_order?.parent?.user?.email || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600 font-bold">{assignment.tailor?.shop_name || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{assignment.uniform_order?.gender || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm">{getStatusBadge(assignment.status || 'pending')}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{new Date(assignment.created_at).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>

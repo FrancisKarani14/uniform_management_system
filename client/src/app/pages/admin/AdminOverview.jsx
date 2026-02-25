@@ -1,10 +1,24 @@
+import { useEffect } from 'react';
+import { useAdminStore } from '../../Stores/admin_stores';
+
 export default function AdminOverview() {
+  const { users, schools, fetchUsers, fetchSchools } = useAdminStore();
+  
+  useEffect(() => {
+    fetchUsers();
+    fetchSchools();
+  }, [fetchUsers, fetchSchools]);
+
+  const parents = users.filter(u => u.role === 'Parent');
+  const tailors = users.filter(u => u.role === 'Tailor');
+  const schoolAdmins = users.filter(u => u.role === 'School_Admin');
+
   const stats = {
-    totalSchools: 15,
-    totalUsers: 245,
-    parents: 180,
-    tailors: 45,
-    schoolAdmins: 20
+    totalSchools: schools.length,
+    totalUsers: users.length,
+    parents: parents.length,
+    tailors: tailors.length,
+    schoolAdmins: schoolAdmins.length
   };
 
   return (

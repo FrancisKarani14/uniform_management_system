@@ -1,17 +1,22 @@
-export default function Overview() {
-  const stats = {
-    uniformApplications: 5,
-    approvedSchools: 2,
-    myStudents: 3
-  };
+import { useEffect } from 'react';
+import { useParentStore } from '../../Stores/parent_stores';
+import EmptyState from '../../components/EmptyState';
+import { FaSchool } from 'react-icons/fa';
 
-  const recentApplications = [
-    { id: 1, student: 'John Doe', school: 'Greenwood High School', tailorProgress: 'received', tailor: 'Mike Tailor', date: '2025-01-15' },
-    { id: 2, student: 'Jane Doe', school: 'Greenwood High School', tailorProgress: 'halfway', tailor: 'Sarah Tailor', date: '2025-01-10' },
-    { id: 3, student: 'Mike Doe', school: 'Sunrise Academy', tailorProgress: 'started', tailor: 'Mike Tailor', date: '2025-01-18' },
-    { id: 4, student: 'Jane Doe', school: 'Greenwood High School', tailorProgress: 'complete', tailor: 'Mike Tailor', date: '2025-01-12' },
-    { id: 5, student: 'Tom Doe', school: 'Valley View School', tailorProgress: 'received', tailor: 'Sarah Tailor', date: '2025-01-14' }
-  ];
+export default function Overview() {
+  const { applications, students, assignments, fetchApplications, fetchStudents, fetchAssignments } = useParentStore();
+
+  useEffect(() => {
+    fetchApplications();
+    fetchStudents();
+    fetchAssignments();
+  }, [fetchApplications, fetchStudents, fetchAssignments]);
+
+  const stats = {
+    uniformApplications: applications.length,
+    approvedSchools: applications.filter(app => app.status === 'APPROVED').length,
+    myStudents: students.length
+  };
 
   const getTailorProgressBadge = (progress) => {
     const badges = {
@@ -58,35 +63,47 @@ export default function Overview() {
 
       <div className="mt-8">
         <h3 className="text-2xl font-bold mb-4 text-gray-900">Recent Application Progress</h3>
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">School</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tailor</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Progress</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {recentApplications.slice(0, 4).map((app) => (
-                <tr key={app.id}>
-                  <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.student}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{app.school}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600 font-bold">{app.tailor}</td>
-                  <td className="px-6 py-4 text-sm">{getTailorProgressBadge(app.tailorProgress)}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{app.date}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="mt-4 text-center">
-          <button className="px-6 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition-all">
-            View More
-          </button>
-        </div>
+        {assignments.length > 0 ? (
+          <>
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">School</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tailor</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Progress</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {assignments.slice(0, 4).map((assignment) => (
+                    <tr key={assignment.id}>
+                      <td className="px-6 py-4 text-sm text-gray-900 font-bold">{assignment.uniform_order?.student || 'N/A'}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{assignment.school?.name || 'N/A'}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600 font-bold">{assignment.tailor?.shop_name || 'N/A'}</td>
+                      <td className="px-6 py-4 text-sm">{getTailorProgressBadge(assignment.status || 'pending')}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{new Date(assignment.created_at).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-4 text-center">
+              <button className="px-6 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition-all">
+                View More
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="bg-white rounded-lg shadow-md">
+            <EmptyState
+              icon={<FaSchool />}
+              title="No Assignments Yet"
+              message="You don't have any uniform assignments yet. Apply to schools and submit uniform orders to get started."
+            />
+          </div>
+        )}
       </div>
     </div>
   );

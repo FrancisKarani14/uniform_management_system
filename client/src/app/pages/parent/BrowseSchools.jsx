@@ -1,40 +1,54 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useParentStore } from '../../Stores/parent_stores';
+import EmptyState from '../../components/EmptyState';
+import { FaSchool } from 'react-icons/fa';
 
 export default function BrowseSchools() {
-  const [schools, setSchools] = useState([
-    { id: 1, name: 'Greenwood High School', location: 'Nairobi', status: 'Available' },
-    { id: 2, name: 'Sunrise Academy', location: 'Mombasa', status: 'Available' },
-    { id: 3, name: 'Valley View School', location: 'Kisumu', status: 'Available' }
-  ]);
+  const { schools, applications, fetchSchools, fetchApplications, createApplication } = useParentStore();
 
-  const handleApply = (schoolId) => {
-    setSchools(schools.map(school => 
-      school.id === schoolId 
-        ? { ...school, status: 'Pending' }
-        : school
-    ));
+  useEffect(() => {
+    fetchSchools();
+    fetchApplications();
+  }, [fetchSchools, fetchApplications]);
+
+  const handleApply = async (schoolId) => {
+    try {
+      await createApplication({ school: schoolId });
+    } catch (error) {
+      console.error('Failed to apply:', error);
+    }
+  };
+
+  const getApplicationStatus = (schoolId) => {
+    const app = applications.find(a => a.school === schoolId);
+    return app ? app.status : null;
   };
 
   const getStatusColor = (status) => {
+    if (!status) return 'bg-green-100 text-green-800';
     switch (status) {
-      case 'Available':
-        return 'bg-green-100 text-green-800';
-      case 'Pending':
+      case 'PENDING':
         return 'bg-yellow-100 text-yellow-800';
-      case 'Approved':
+      case 'APPROVED':
         return 'bg-blue-100 text-blue-800';
-      case 'Rejected':
+      case 'REJECTED':
         return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
+  const getStatusLabel = (status) => {
+    if (!status) return 'Available';
+    return status.charAt(0) + status.slice(1).toLowerCase();
+  };
+
   return (
     <div>
       <h2 className="text-3xl font-bold mb-8 text-gray-900">Browse Schools</h2>
       
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      {schools.length > 0 ? (
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
@@ -45,32 +59,44 @@ export default function BrowseSchools() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {schools.map((school) => (
-              <tr key={school.id}>
-                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{school.name}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{school.location}</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(school.status)}`}>
-                    {school.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm">
-                  {school.status === 'Available' ? (
-                    <button 
-                      onClick={() => handleApply(school.id)}
-                      className="text-blue-700 hover:text-blue-800 font-medium"
-                    >
-                      Apply
-                    </button>
-                  ) : (
-                    <span className="text-gray-400">Applied</span>
-                  )}
-                </td>
-              </tr>
-            ))}
+            {schools.map((school) => {
+              const appStatus = getApplicationStatus(school.id);
+              return (
+                <tr key={school.id}>
+                  <td className="px-6 py-4 text-sm text-gray-900 font-bold">{school.name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{school.location}</td>
+                  <td className="px-6 py-4 text-sm">
+                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(appStatus)}`}>
+                      {getStatusLabel(appStatus)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm">
+                    {!appStatus ? (
+                      <button 
+                        onClick={() => handleApply(school.id)}
+                        className="text-blue-700 hover:text-blue-800 font-medium"
+                      >
+                        Apply
+                      </button>
+                    ) : (
+                      <span className="text-gray-400">Applied</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-md">
+          <EmptyState
+            icon={<FaSchool />}
+            title="No Schools Available"
+            message="There are currently no schools in the system. Please check back later or contact the administrator."
+          />
+        </div>
+      )}
     </div>
   );
 }

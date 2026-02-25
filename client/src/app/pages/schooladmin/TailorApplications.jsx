@@ -1,25 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSchoolAdminStore } from '../../Stores/schooladmin_stores';
 
 export default function TailorApplications() {
-  const [applications, setApplications] = useState([
-    { id: 1, name: 'Frank Taylor', email: 'frank@example.com', location: 'Nairobi', status: 'Pending', date: '2025-01-20' },
-    { id: 2, name: 'Grace Miller', email: 'grace@example.com', location: 'Mombasa', status: 'Pending', date: '2025-01-19' },
-    { id: 3, name: 'Henry Wilson', email: 'henry@example.com', location: 'Kisumu', status: 'Approved', date: '2025-01-18' }
-  ]);
+  const { tailorApplications, fetchTailorApplications, updateTailorApplicationStatus } = useSchoolAdminStore();
+  
+  useEffect(() => {
+    fetchTailorApplications();
+  }, [fetchTailorApplications]);
 
-  const handleAction = (id, action) => {
-    setApplications(applications.map(app =>
-      app.id === id ? { ...app, status: action } : app
-    ));
+  const handleAction = async (id, action) => {
+    try {
+      await updateTailorApplicationStatus(id, action);
+    } catch (error) {
+      console.error('Failed to update application:', error);
+    }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Approved': return 'bg-green-100 text-green-800';
-      case 'Rejected': return 'bg-red-100 text-red-800';
-      case 'Pending': return 'bg-yellow-100 text-yellow-800';
+      case 'APPROVED': return 'bg-green-100 text-green-800';
+      case 'REJECTED': return 'bg-red-100 text-red-800';
+      case 'PENDING': return 'bg-yellow-100 text-yellow-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const getStatusLabel = (status) => {
+    return status ? status.charAt(0) + status.slice(1).toLowerCase() : 'Unknown';
   };
 
   return (
@@ -39,28 +46,28 @@ export default function TailorApplications() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {applications.map((app) => (
+            {tailorApplications.map((app) => (
               <tr key={app.id}>
-                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.name}</td>
-                <td className="px-6 py-4 text-sm text-gray-600 font-bold">{app.email}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{app.location}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{app.date}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.tailor?.shop_name || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600 font-bold">{app.tailor?.user?.email || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{app.tailor?.location || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{new Date(app.applied_at).toLocaleDateString()}</td>
                 <td className="px-6 py-4 text-sm">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(app.status)}`}>
-                    {app.status}
+                    {getStatusLabel(app.status)}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm">
-                  {app.status === 'Pending' ? (
+                  {app.status === 'PENDING' ? (
                     <div className="flex gap-2">
                       <button
-                        onClick={() => handleAction(app.id, 'Approved')}
+                        onClick={() => handleAction(app.id, 'APPROVED')}
                         className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-all text-xs"
                       >
                         Approve
                       </button>
                       <button
-                        onClick={() => handleAction(app.id, 'Rejected')}
+                        onClick={() => handleAction(app.id, 'REJECTED')}
                         className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all text-xs"
                       >
                         Reject

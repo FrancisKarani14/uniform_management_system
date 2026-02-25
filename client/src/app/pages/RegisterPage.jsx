@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import API from '../Api/Api';
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
   const [showEmailModal, setShowEmailModal] = useState(false);
