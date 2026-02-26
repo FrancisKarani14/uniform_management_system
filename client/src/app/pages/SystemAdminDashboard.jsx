@@ -75,6 +75,19 @@ export default function SystemAdminDashboard() {
               <AiOutlineBank className="text-xl" />
               <span>Schools</span>
             </NavLink>
+            <NavLink
+              to="/admin-dashboard/profile"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
+                  isActive
+                    ? 'bg-blue-700 text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`
+              }
+            >
+              <AiOutlineUser className="text-xl" />
+              <span>Profile</span>
+            </NavLink>
           </nav>
         </aside>
 

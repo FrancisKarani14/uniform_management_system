@@ -91,6 +91,19 @@ export default function TailorDashboard() {
                   <span>My Assignments</span>
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/tailor-dashboard/profile"
+                  className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
+                    isActive('/tailor-dashboard/profile')
+                      ? 'bg-blue-700 text-white'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <AiOutlineUser className="text-xl" />
+                  <span>Profile</span>
+                </Link>
+              </li>
             </ul>
           </nav>
         </aside>

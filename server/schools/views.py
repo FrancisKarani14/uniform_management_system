@@ -1,5 +1,7 @@
 from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import School, Parent_school_application
 from .serializers import School_modelSerializer, Parent_school_application_modelSerializer
@@ -65,5 +67,51 @@ class Parent_school_application_modelViewSet(viewsets.ModelViewSet):
                 return Parent_school_application.objects.filter(school=user.school_admin_profile.school)
         
         return Parent_school_application.objects.none()
+    
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def approve(self, request, pk=None):
+        """
+        Approve a parent school application.
+        POST /api/schools/parent_school_applications/{id}/approve/
+        """
+        application = self.get_object()
+        
+        # Only school admin of the specific school can approve
+        if request.user.role != 'School_Admin' or not hasattr(request.user, 'school_admin_profile'):
+            return Response({'error': 'Only school admins can approve applications'}, status=status.HTTP_403_FORBIDDEN)
+        
+        if request.user.school_admin_profile.school != application.school:
+            return Response({'error': 'You can only approve applications to your school'}, status=status.HTTP_403_FORBIDDEN)
+        
+        if application.status != 'Pending':
+            return Response({'error': f'Application is already {application.status}'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        application.status = 'Approved'
+        application.save()
+        
+        return Response({'message': 'Application approved successfully', 'application': self.get_serializer(application).data})
+    
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def reject(self, request, pk=None):
+        """
+        Reject a parent school application.
+        POST /api/schools/parent_school_applications/{id}/reject/
+        """
+        application = self.get_object()
+        
+        # Only school admin of the specific school can reject
+        if request.user.role != 'School_Admin' or not hasattr(request.user, 'school_admin_profile'):
+            return Response({'error': 'Only school admins can reject applications'}, status=status.HTTP_403_FORBIDDEN)
+        
+        if request.user.school_admin_profile.school != application.school:
+            return Response({'error': 'You can only reject applications to your school'}, status=status.HTTP_403_FORBIDDEN)
+        
+        if application.status != 'Pending':
+            return Response({'error': f'Application is already {application.status}'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        application.status = 'Rejected'
+        application.save()
+        
+        return Response({'message': 'Application rejected successfully', 'application': self.get_serializer(application).data})
 
 

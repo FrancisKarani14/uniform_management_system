@@ -15,6 +15,14 @@ class School(models.Model):
 
 # create a parent_school_application
 class Parent_school_application(models.Model):
+    class Status(models.TextChoices):
+        PENDING = 'Pending'
+        APPROVED = 'Approved'
+        REJECTED = 'Rejected'
+    
     parent = models.ForeignKey('users.ParentProfile', on_delete=models.CASCADE, related_name='parent_school_applications')
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='parent_school_applications')
     student = models.ForeignKey('users.StudentProfile', on_delete=models.CASCADE, related_name='parent_school_applications')
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)

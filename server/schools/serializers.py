@@ -16,6 +16,7 @@ class Parent_school_application_modelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Parent_school_application
         fields = '__all__'
+        read_only_fields = ['status', 'created_at', 'updated_at']
     
     def get_parent(self, obj):
         if obj.parent:
@@ -24,7 +25,7 @@ class Parent_school_application_modelSerializer(serializers.ModelSerializer):
     
     def get_school(self, obj):
         if obj.school:
-            return {'id': obj.school.id, 'name': obj.school.name}
+            return {'id': obj.school.id, 'name': obj.school.name, 'location': obj.school.location}
         return None
     
     def get_student(self, obj):

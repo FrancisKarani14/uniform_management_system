@@ -94,6 +94,40 @@ export const useSchoolAdminStore = create((set) => ({
     }
   },
 
+  approveParentApplication: async (applicationId) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await API.post(`/schools/parent_school_applications/${applicationId}/approve/`);
+      set((state) => ({
+        parentApplications: state.parentApplications.map(app => 
+          app.id === applicationId ? { ...app, status: 'Approved' } : app
+        ),
+        loading: false
+      }));
+      return response.data;
+    } catch (error) {
+      set({ error: error.message, loading: false });
+      throw error;
+    }
+  },
+
+  rejectParentApplication: async (applicationId) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await API.post(`/schools/parent_school_applications/${applicationId}/reject/`);
+      set((state) => ({
+        parentApplications: state.parentApplications.map(app => 
+          app.id === applicationId ? { ...app, status: 'Rejected' } : app
+        ),
+        loading: false
+      }));
+      return response.data;
+    } catch (error) {
+      set({ error: error.message, loading: false });
+      throw error;
+    }
+  },
+
   createAssignment: async (data) => {
     set({ loading: true, error: null });
     try {

@@ -89,9 +89,8 @@ class StudentProfile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
     parent = models.ForeignKey(ParentProfile, on_delete=models.CASCADE, related_name='children')
-    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='students')
+    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='students', null=True, blank=True)
     admission_number = models.CharField(max_length=50, unique=True)
-    date_of_birth = models.DateField()
     gender = models.CharField(max_length=10, choices=Gender.choices)
     
 

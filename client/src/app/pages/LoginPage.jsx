@@ -38,7 +38,20 @@ export default function LoginPage() {
     try {
       await login(email, password);
       const userResponse = await API.get('/users/users/me/');
-      const userRole = userResponse.data.role;
+      const userData = userResponse.data;
+      
+      // Check if profile exists
+      const hasProfile = (
+        (userData.role === 'Parent' && userData.parent_profile) ||
+        (userData.role === 'Tailor' && userData.tailor_profile) ||
+        (userData.role === 'School_Admin' && userData.school_admin_profile) ||
+        (userData.role === 'Admin' && userData.admin_profile)
+      );
+      
+      if (!hasProfile) {
+        navigate('/complete-profile');
+        return;
+      }
       
       const roleRoutes = {
         'Admin': '/admin-dashboard',
@@ -47,7 +60,7 @@ export default function LoginPage() {
         'Tailor': '/tailor-dashboard'
       };
       
-      navigate(roleRoutes[userRole] || '/parent-dashboard');
+      navigate(roleRoutes[userData.role] || '/parent-dashboard');
     } catch (error) {
       setError(error.response?.data?.detail || 'Login failed. Please check your credentials.');
     }

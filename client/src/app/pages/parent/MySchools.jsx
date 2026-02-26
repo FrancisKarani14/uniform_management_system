@@ -11,8 +11,8 @@ export default function MySchools() {
     fetchStudents();
   }, [fetchApplications, fetchStudents]);
 
-  const approvedSchools = applications.filter(app => app.status === 'APPROVED');
-  const uniqueSchools = [...new Map(approvedSchools.map(app => [app.school?.id, app.school])).values()];
+  const approvedSchools = applications.filter(app => app.status?.toUpperCase() === 'APPROVED');
+  const uniqueSchools = [...new Map(approvedSchools.map(app => [app.school?.id, app.school])).values()].filter(Boolean);
 
   const [showModal, setShowModal] = useState(false);
   const [selectedSchool, setSelectedSchool] = useState(null);
@@ -52,7 +52,7 @@ export default function MySchools() {
           {uniqueSchools.map((school) => (
           <div key={school.id} className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-bold text-gray-900 mb-2">{school.name}</h3>
-            <p className="text-gray-600 mb-1">Location: {school.location}</p>
+            <p className="text-gray-600 mb-1">Location: {school.location || 'N/A'}</p>
             <p className="text-gray-600 mb-1">Students Enrolled: {getStudentCountForSchool(school.id)}</p>
             <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs mt-2">
               Active
