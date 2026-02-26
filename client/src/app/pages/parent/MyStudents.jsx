@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParentStore } from '../../Stores/parent_stores';
 import EmptyState from '../../components/EmptyState';
 import { FaUserGraduate } from 'react-icons/fa';
+import API from '../../Api/Api';
 
 export default function MyStudents() {
   const { students, fetchStudents } = useParentStore();
@@ -11,17 +12,49 @@ export default function MyStudents() {
   }, [fetchStudents]);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    gender: '',
-    grade: '',
-    dateOfBirth: ''
+    first_name: '',
+    last_name: '',
+    admission_number: '',
+    gender: ''
   });
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Implement create student API call
-    setShowModal(false);
-    setFormData({ name: '', gender: '', grade: '', dateOfBirth: '' });
+    setError('');
+    
+    try {
+      const response = await API.get('/users/users/me/');
+      const parentProfileId = response.data.parent_profile.id;
+      
+      // Generate email from name and admission number
+      const email = `${formData.first_name.toLowerCase()}.${formData.last_name.toLowerCase()}.${formData.admission_number}@student.com`;
+      
+      // Create user account for student
+      const userResponse = await API.post('/users/users/', {
+        email: email,
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        password: formData.admission_number,
+        role: 'Student'
+      });
+      
+      // Create student profile
+      await API.post('/users/student_profiles/', {
+        user: userResponse.data.id,
+        parent: parentProfileId,
+        school: null,
+        admission_number: formData.admission_number,
+        gender: formData.gender
+      });
+      
+      setShowModal(false);
+      setFormData({ first_name: '', last_name: '', admission_number: '', gender: '' });
+      fetchStudents();
+    } catch (error) {
+      console.error('Failed to add student:', error);
+      setError(error.response?.data?.admission_number?.[0] || 'Failed to add student');
+    }
   };
 
   return (
@@ -67,50 +100,57 @@ export default function MyStudents() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
             <h3 className="text-2xl font-bold mb-6 text-gray-900">Add Child</h3>
+            
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                {error}
+              </div>
+            )}
+            
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
                 <input
                   type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                  value={formData.first_name}
+                  onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-700"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                <input
+                  type="text"
+                  value={formData.last_name}
+                  onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-700"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Admission Number *</label>
+                <input
+                  type="text"
+                  value={formData.admission_number}
+                  onChange={(e) => setFormData({ ...formData, admission_number: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-700"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Gender *</label>
                 <select
                   value={formData.gender}
                   onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-700"
                   required
                 >
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
+                  <option value="Other">Other</option>
                 </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Grade/Class</label>
-                <input
-                  type="text"
-                  value={formData.grade}
-                  onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-700 focus:border-transparent"
-                  placeholder="e.g., Grade 8"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
-                <input
-                  type="date"
-                  value={formData.dateOfBirth}
-                  onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-700 focus:border-transparent"
-                  required
-                />
               </div>
               <div className="flex gap-3 mt-6">
                 <button

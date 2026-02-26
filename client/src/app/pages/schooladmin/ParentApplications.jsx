@@ -2,19 +2,26 @@ import { useState, useEffect } from 'react';
 import { useSchoolAdminStore } from '../../Stores/schooladmin_stores';
 
 export default function ParentApplications() {
-  const { parentApplications, fetchParentApplications } = useSchoolAdminStore();
+  const { parentApplications, fetchParentApplications, approveParentApplication, rejectParentApplication } = useSchoolAdminStore();
   
   useEffect(() => {
     fetchParentApplications();
   }, [fetchParentApplications]);
 
   const handleAction = async (id, action) => {
-    // TODO: Implement update parent application status
-    console.log('Update application', id, action);
+    try {
+      if (action === 'APPROVED') {
+        await approveParentApplication(id);
+      } else if (action === 'REJECTED') {
+        await rejectParentApplication(id);
+      }
+    } catch (error) {
+      console.error('Failed to update application:', error);
+    }
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
+    switch (status?.toUpperCase()) {
       case 'APPROVED': return 'bg-green-100 text-green-800';
       case 'REJECTED': return 'bg-red-100 text-red-800';
       case 'PENDING': return 'bg-yellow-100 text-yellow-800';
@@ -53,7 +60,7 @@ export default function ParentApplications() {
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm">
-                  {app.status === 'PENDING' ? (
+                  {app.status?.toUpperCase() === 'PENDING' ? (
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleAction(app.id, 'APPROVED')}

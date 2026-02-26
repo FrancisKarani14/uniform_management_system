@@ -24,6 +24,8 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_permissions(self):
+        if self.action == 'create':
+            return [IsAuthenticated()]
         if self.action == 'upgrade_to_school_admin':
             return [IsSystemAdmin()]
         return [IsAuthenticated()]
@@ -119,4 +121,4 @@ class ParentProfileViewSet(viewsets.ModelViewSet):
 class StudentProfileViewSet(viewsets.ModelViewSet):
     queryset = StudentProfile.objects.all()
     serializer_class = StudentProfileSerializer
-    permission_classes = [IsSystemAdmin | IsStudent]
+    permission_classes = [IsSystemAdmin | IsParent | IsStudent]
