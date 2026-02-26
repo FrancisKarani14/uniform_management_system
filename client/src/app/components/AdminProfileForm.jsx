@@ -20,7 +20,7 @@ export default function AdminProfileForm({ user }) {
         user: user.id,
         ...formData
       });
-      navigate('/admin-dashboard');
+      navigate('/admin-dashboard/profile');
     } catch (error) {
       setError(error.response?.data?.detail || 'Failed to create profile');
       setLoading(false);

@@ -3,7 +3,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import User, AdminProfile, TailorProfile, SchoolAdminProfile, ParentProfile, StudentProfile
-from .serializers import UserSerializer, TailorProfileSerializer, ParentProfileSerializer, SchoolAdminProfile, StudentProfileSerializer, AdminProfileSerializer  
+from .serializers import UserSerializer, TailorProfileSerializer, ParentProfileSerializer, SchoolAdminProfileSerializer, StudentProfileSerializer, AdminProfileSerializer  
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 # from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -100,7 +100,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
 # school adminprofile viewset
 class SchoolAdminProfileViewSet(viewsets.ModelViewSet):
     queryset = SchoolAdminProfile.objects.all()
-    serializer_class = SchoolAdminProfile
+    serializer_class = SchoolAdminProfileSerializer
     permission_classes = [IsSystemAdmin | IsSchoolAdmin]
 
 # Tailor profile viewset

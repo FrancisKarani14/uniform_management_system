@@ -21,7 +21,7 @@ export default function ParentProfileForm({ user }) {
         user: user.id,
         ...formData
       });
-      navigate('/parent-dashboard');
+      navigate('/parent-dashboard/profile');
     } catch (error) {
       setError(error.response?.data?.detail || 'Failed to create profile');
       setLoading(false);

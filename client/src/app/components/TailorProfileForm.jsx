@@ -22,7 +22,7 @@ export default function TailorProfileForm({ user }) {
         user: user.id,
         ...formData
       });
-      navigate('/tailor-dashboard');
+      navigate('/tailor-dashboard/profile');
     } catch (error) {
       setError(error.response?.data?.detail || 'Failed to create profile');
       setLoading(false);

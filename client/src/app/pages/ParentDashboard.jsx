@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { AiOutlineHome, AiOutlineSearch, AiOutlineTeam, AiOutlineFileText, AiOutlineBank } from 'react-icons/ai';
+import { AiOutlineHome, AiOutlineSearch, AiOutlineTeam, AiOutlineFileText, AiOutlineBank, AiOutlineUser } from 'react-icons/ai';
 import { FaGraduationCap } from 'react-icons/fa';
 import API from '../Api/Api';
 
@@ -127,6 +127,19 @@ export default function ParentDashboard() {
             >
               <AiOutlineBank className="text-xl" />
               <span>My Schools</span>
+            </NavLink>
+            <NavLink
+              to="/parent-dashboard/profile"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
+                  isActive
+                    ? 'bg-blue-700 text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`
+              }
+            >
+              <AiOutlineUser className="text-xl" />
+              <span>Profile</span>
             </NavLink>
           </nav>
         </aside>

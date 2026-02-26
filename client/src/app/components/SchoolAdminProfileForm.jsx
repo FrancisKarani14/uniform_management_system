@@ -20,7 +20,7 @@ export default function SchoolAdminProfileForm({ user }) {
         user: user.id,
         ...formData
       });
-      navigate('/school-admin-dashboard');
+      navigate('/school-admin-dashboard/profile');
     } catch (error) {
       setError(error.response?.data?.detail || 'Failed to create profile');
       setLoading(false);
