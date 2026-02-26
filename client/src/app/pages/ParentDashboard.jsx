@@ -1,9 +1,36 @@
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { AiOutlineHome, AiOutlineSearch, AiOutlineTeam, AiOutlineFileText, AiOutlineBank } from 'react-icons/ai';
 import { FaGraduationCap } from 'react-icons/fa';
+import API from '../Api/Api';
 
 export default function ParentDashboard() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkProfile = async () => {
+      try {
+        const response = await API.get('/users/users/me/');
+        if (!response.data.parent_profile) {
+          navigate('/complete-profile');
+        } else {
+          setLoading(false);
+        }
+      } catch (error) {
+        navigate('/login');
+      }
+    };
+    checkProfile();
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl text-gray-600">Loading...</div>
+      </div>
+    );
+  }
 
   const handleLogout = () => {
     navigate('/');

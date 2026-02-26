@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LandingPage from './app/pages/LandingPage';
 import LoginPage from './app/pages/LoginPage';
 import RegisterPage from './app/pages/RegisterPage';
+import CompleteProfilePage from './app/pages/CompleteProfilePage';
 import ParentDashboard from './app/pages/ParentDashboard';
 import Overview from './app/pages/parent/Overview';
 import BrowseSchools from './app/pages/parent/BrowseSchools';
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<RegisterPage />} />
+        <Route path="/complete-profile" element={<CompleteProfilePage />} />
         <Route path="/parent-dashboard" element={<ParentDashboard />}>
           <Route index element={<Overview />} />
           <Route path="browse-schools" element={<BrowseSchools />} />

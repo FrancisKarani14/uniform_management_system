@@ -29,6 +29,9 @@ class CustomTokenSerializer(TokenObtainPairSerializer):
 # serialize user model
 class UserSerializer(serializers.ModelSerializer):
     school_admin_profile = serializers.SerializerMethodField()
+    parent_profile = serializers.SerializerMethodField()
+    tailor_profile = serializers.SerializerMethodField()
+    admin_profile = serializers.SerializerMethodField()
     
     class Meta:
         model = User
@@ -39,7 +42,38 @@ class UserSerializer(serializers.ModelSerializer):
             profile = obj.school_admin_profile
             return {
                 'id': profile.id,
+                'phone_number': profile.phone_number,
                 'school': {'id': profile.school.id, 'name': profile.school.name} if profile.school else None
+            }
+        return None
+    
+    def get_parent_profile(self, obj):
+        if hasattr(obj, 'parent_profile'):
+            profile = obj.parent_profile
+            return {
+                'id': profile.id,
+                'phone_number': profile.phone_number,
+                'address': profile.address
+            }
+        return None
+    
+    def get_tailor_profile(self, obj):
+        if hasattr(obj, 'tailor_profile'):
+            profile = obj.tailor_profile
+            return {
+                'id': profile.id,
+                'shop_name': profile.shop_name,
+                'location': profile.location,
+                'phone_number': profile.phone_number
+            }
+        return None
+    
+    def get_admin_profile(self, obj):
+        if hasattr(obj, 'admin_profile'):
+            profile = obj.admin_profile
+            return {
+                'id': profile.id,
+                'phone_number': profile.phone_number
             }
         return None
 
