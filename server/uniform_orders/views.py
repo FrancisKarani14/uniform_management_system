@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from .models import Uniform_assignment, Uniform_order
 from .serializers import Uniform_assignmentSerializer, Uniform_orderSerializer
-from .permissions import CanCreateUniformOrder, CanManageUniformAssignment
+from .permissions import CanCreateUniformOrder, CanManageUniformAssignment, CanUpdateAssignmentStatus
 from users.permissions import IsParent, IsSchoolAdmin
 
 
@@ -83,9 +83,12 @@ class Uniform_assignmentViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         """
         School admins can create assignments.
+        Tailors can update status.
         Tailors, parents, and school admins can view.
         """
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+        if self.action in ['create', 'destroy']:
             return [IsSchoolAdmin()]
+        if self.action in ['update', 'partial_update']:
+            return [CanUpdateAssignmentStatus()]
         return [CanManageUniformAssignment()]
 

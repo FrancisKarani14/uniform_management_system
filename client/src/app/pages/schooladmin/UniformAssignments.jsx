@@ -37,9 +37,9 @@ export default function UniformAssignments() {
           <tbody className="divide-y divide-gray-200">
             {assignments.map((assignment) => (
               <tr key={assignment.id}>
-                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{assignment.uniform_order?.student || 'N/A'}</td>
-                <td className="px-6 py-4 text-sm text-gray-600 font-bold">{assignment.uniform_order?.parent?.user?.email || 'N/A'}</td>
-                <td className="px-6 py-4 text-sm text-gray-600 font-bold">{assignment.tailor?.shop_name || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{assignment.uniform_order_details?.gender || '-'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600 font-bold">{assignment.uniform_order_details?.parent?.user?.email || '-'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600 font-bold">{assignment.tailor_details?.shop_name || '-'}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{new Date(assignment.created_at).toLocaleDateString()}</td>
                 <td className="px-6 py-4 text-sm">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(assignment.status)}`}>

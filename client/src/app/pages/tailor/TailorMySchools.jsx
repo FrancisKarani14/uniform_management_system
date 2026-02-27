@@ -35,8 +35,8 @@ export default function TailorMySchools() {
           <tbody className="divide-y divide-gray-200">
             {approvedSchools.map((app) => (
               <tr key={app.id}>
-                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.school?.name || 'N/A'}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{app.school?.location || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.school_details?.name || '-'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{app.school_details?.location || '-'}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{app.school?.students?.length || 0}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{getAssignmentCountForSchool(app.school?.id)}</td>
               </tr>

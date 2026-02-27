@@ -4,13 +4,23 @@ import { useTailorStore } from '../../Stores/tailor_stores';
 import API from '../../Api/Api';
 
 export default function UniformApplications() {
-  const { orders, fetchOrders, updateOrderStatus, createAssignment } = useSchoolAdminStore();
+  const { orders, fetchOrders, createAssignment, assignments, fetchAssignments } = useSchoolAdminStore();
   const { applications: tailorApps, fetchApplications: fetchTailorApps } = useTailorStore();
   
+  const [assignedOrders, setAssignedOrders] = useState(new Set());
+
   useEffect(() => {
     fetchOrders();
     fetchTailorApps();
-  }, [fetchOrders, fetchTailorApps]);
+    fetchAssignments();
+  }, [fetchOrders, fetchTailorApps, fetchAssignments]);
+
+  useEffect(() => {
+    const assigned = new Set(orders.filter(order => 
+      assignments.some(a => a.uniform_order === order.id || a.uniform_order_details?.id === order.id)
+    ).map(o => o.id));
+    setAssignedOrders(assigned);
+  }, [orders, assignments]);
 
   const approvedTailors = tailorApps.filter(app => app.status === 'APPROVED');
 
@@ -44,10 +54,13 @@ export default function UniformApplications() {
         tailor: parseInt(selectedTailor),
         school: selectedApp.school
       });
+      setAssignedOrders(prev => new Set([...prev, selectedApp.id]));
       setShowAssign(false);
       setSelectedTailor('');
+      await fetchOrders();
     } catch (error) {
       console.error('Failed to assign tailor:', error);
+      alert('Failed to assign tailor');
     }
   };
 
@@ -97,7 +110,7 @@ export default function UniformApplications() {
                     >
                       View Details
                     </button>
-                    {app.status === 'APPROVED' && (
+                    {app.status === 'APPROVED' && !assignedOrders.has(app.id) && (
                       <button
                         onClick={() => {
                           setSelectedApp(app);
@@ -107,6 +120,11 @@ export default function UniformApplications() {
                       >
                         Assign Tailor
                       </button>
+                    )}
+                    {assignedOrders.has(app.id) && (
+                      <span className="px-3 py-1 bg-gray-300 text-gray-600 rounded-md text-xs">
+                        Assigned
+                      </span>
                     )}
                   </div>
                 </td>
@@ -122,7 +140,7 @@ export default function UniformApplications() {
           <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl border border-gray-200">
             <h3 className="text-2xl font-bold mb-6 text-gray-900">Application Details</h3>
             <div className="space-y-3 mb-6">
-              <div><span className="font-bold">Parent:</span> {selectedApp.parent_details?.name || 'N/A'}</div>
+              <div><span className="font-bold">Parent:</span> {selectedApp.parent_details?.name}</div>
               <div><span className="font-bold">Gender:</span> {selectedApp.gender}</div>
               <div><span className="font-bold">Shirt Size:</span> {selectedApp.shirt_size}</div>
               <div><span className="font-bold">Trouser Size:</span> {selectedApp.trouser_size}</div>
@@ -172,7 +190,9 @@ export default function UniformApplications() {
             >
               <option value="">Select Tailor</option>
               {approvedTailors.map(tailor => (
-                <option key={tailor.tailor} value={tailor.tailor}>{tailor.tailor?.shop_name || `Tailor ${tailor.tailor}`}</option>
+                <option key={tailor.tailor} value={tailor.tailor}>
+                  {tailor.tailor_details?.shop_name || `Tailor ${tailor.tailor}`}
+                </option>
               ))}
             </select>
             <div className="flex gap-3">

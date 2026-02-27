@@ -69,9 +69,9 @@ export default function TailorMyAssignments() {
           <tbody className="divide-y divide-gray-200">
             {assignments.map((assignment) => (
               <tr key={assignment.id}>
-                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{assignment.uniform_order?.student || 'N/A'}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{assignment.school?.name || 'N/A'}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{assignment.uniform_order?.gender || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{assignment.uniform_order_details?.parent?.name || '-'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{assignment.school_details?.name || '-'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{assignment.uniform_order_details?.gender || '-'}</td>
                 <td className="px-6 py-4 text-sm">{getStatusBadge(assignment.status || 'pending')}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{new Date(assignment.created_at).toLocaleDateString()}</td>
                 <td className="px-6 py-4 text-sm">
@@ -106,15 +106,15 @@ export default function TailorMyAssignments() {
             <div className="space-y-4 mb-6">
               <div>
                 <span className="font-bold text-gray-700">Student:</span>
-                <span className="ml-2 text-gray-600">{selectedAssignment.uniform_order?.student || 'N/A'}</span>
+                <span className="ml-2 text-gray-600">{selectedAssignment.uniform_order_details?.parent?.name || '-'}</span>
               </div>
               <div>
                 <span className="font-bold text-gray-700">School:</span>
-                <span className="ml-2 text-gray-600">{selectedAssignment.school?.name || 'N/A'}</span>
+                <span className="ml-2 text-gray-600">{selectedAssignment.school_details?.name || '-'}</span>
               </div>
               <div>
                 <span className="font-bold text-gray-700">Uniform Type:</span>
-                <span className="ml-2 text-gray-600">{selectedAssignment.uniform_order?.gender || 'N/A'}</span>
+                <span className="ml-2 text-gray-600">{selectedAssignment.uniform_order_details?.gender || '-'}</span>
               </div>
               <div>
                 <span className="font-bold text-gray-700">Assignment Date:</span>
@@ -131,19 +131,27 @@ export default function TailorMyAssignments() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <span className="text-sm text-gray-600">Shirt:</span>
-                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.uniform_order?.shirt_size || 'N/A'}</span>
+                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.uniform_order_details?.shirt_size || '-'}</span>
                 </div>
                 <div>
                   <span className="text-sm text-gray-600">Trouser:</span>
-                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.uniform_order?.trouser_size || 'N/A'}</span>
+                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.uniform_order_details?.trouser_size || '-'}</span>
                 </div>
                 <div>
                   <span className="text-sm text-gray-600">Shoes:</span>
-                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.uniform_order?.shoes_size || 'N/A'}</span>
+                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.uniform_order_details?.shoes_size || '-'}</span>
                 </div>
                 <div>
                   <span className="text-sm text-gray-600">Sweater:</span>
-                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.uniform_order?.sweater_size || 'N/A'}</span>
+                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.uniform_order_details?.sweater_size || '-'}</span>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-600">Blouse:</span>
+                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.uniform_order_details?.blouse_size || '-'}</span>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-600">Skirt:</span>
+                  <span className="ml-2 font-medium text-gray-900">{selectedAssignment.uniform_order_details?.skirt_size || '-'}</span>
                 </div>
               </div>
             </div>
