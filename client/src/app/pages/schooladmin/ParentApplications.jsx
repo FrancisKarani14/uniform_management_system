@@ -51,8 +51,8 @@ export default function ParentApplications() {
           <tbody className="divide-y divide-gray-200">
             {parentApplications.map((app) => (
               <tr key={app.id}>
-                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.parent?.user?.email || 'N/A'}</td>
-                <td className="px-6 py-4 text-sm text-gray-600 font-bold">{app.parent?.user?.email || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.parent_details?.name || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{app.parent_details?.email || 'N/A'}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{new Date(app.created_at || Date.now()).toLocaleDateString()}</td>
                 <td className="px-6 py-4 text-sm">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(app.status)}`}>

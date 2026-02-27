@@ -19,8 +19,13 @@ class Parent_school_application_modelSerializer(serializers.ModelSerializer):
         read_only_fields = ['status', 'created_at', 'updated_at']
     
     def get_parent_details(self, obj):
-        if obj.parent:
-            return {'id': obj.parent.id, 'user': {'email': obj.parent.user.email}}
+        if obj.parent and obj.parent.user:
+            return {
+                'id': obj.parent.id, 
+                'name': f"{obj.parent.user.first_name} {obj.parent.user.last_name}",
+                'email': obj.parent.user.email,
+                'phone_number': obj.parent.phone_number
+            }
         return None
     
     def get_school_details(self, obj):
