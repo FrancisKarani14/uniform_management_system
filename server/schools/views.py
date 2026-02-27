@@ -80,16 +80,21 @@ class Parent_school_application_modelViewSet(viewsets.ModelViewSet):
         if request.user.role != 'School_Admin' or not hasattr(request.user, 'school_admin_profile'):
             return Response({'error': 'Only school admins can approve applications'}, status=status.HTTP_403_FORBIDDEN)
         
-        if request.user.school_admin_profile.school != application.school:
+        school_admin_school = request.user.school_admin_profile.school
+        if not school_admin_school:
+            return Response({'error': 'School admin must be assigned to a school'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if school_admin_school != application.school:
             return Response({'error': 'You can only approve applications to your school'}, status=status.HTTP_403_FORBIDDEN)
         
-        if application.status != 'Pending':
+        if application.status != Parent_school_application.Status.PENDING:
             return Response({'error': f'Application is already {application.status}'}, status=status.HTTP_400_BAD_REQUEST)
         
-        application.status = 'Approved'
+        application.status = Parent_school_application.Status.APPROVED
         application.save()
         
-        return Response({'message': 'Application approved successfully', 'application': self.get_serializer(application).data})
+        serializer = self.get_serializer(application)
+        return Response({'message': 'Application approved successfully', 'application': serializer.data}, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def reject(self, request, pk=None):
@@ -103,15 +108,20 @@ class Parent_school_application_modelViewSet(viewsets.ModelViewSet):
         if request.user.role != 'School_Admin' or not hasattr(request.user, 'school_admin_profile'):
             return Response({'error': 'Only school admins can reject applications'}, status=status.HTTP_403_FORBIDDEN)
         
-        if request.user.school_admin_profile.school != application.school:
+        school_admin_school = request.user.school_admin_profile.school
+        if not school_admin_school:
+            return Response({'error': 'School admin must be assigned to a school'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if school_admin_school != application.school:
             return Response({'error': 'You can only reject applications to your school'}, status=status.HTTP_403_FORBIDDEN)
         
-        if application.status != 'Pending':
+        if application.status != Parent_school_application.Status.PENDING:
             return Response({'error': f'Application is already {application.status}'}, status=status.HTTP_400_BAD_REQUEST)
         
-        application.status = 'Rejected'
+        application.status = Parent_school_application.Status.REJECTED
         application.save()
         
-        return Response({'message': 'Application rejected successfully', 'application': self.get_serializer(application).data})
+        serializer = self.get_serializer(application)
+        return Response({'message': 'Application rejected successfully', 'application': serializer.data}, status=status.HTTP_200_OK)
 
 

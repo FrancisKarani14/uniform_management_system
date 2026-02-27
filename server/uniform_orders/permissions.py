@@ -40,10 +40,15 @@ class CanViewUniformOrder(permissions.BasePermission):
 class CanManageUniformAssignment(permissions.BasePermission):
     """
     Permission for school admins to assign uniform orders to tailors.
+    Tailors and parents can view assignments.
     """
-    message = "Only school administrators can manage uniform assignments"
+    message = "You don't have permission to manage uniform assignments"
     
     def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            # Tailors, parents, school admins can view
+            return request.user.is_authenticated and request.user.role in ['School_Admin', 'Admin', 'Tailor', 'Parent']
+        # Only school admins can create/update/delete
         return request.user.is_authenticated and request.user.role in ['School_Admin', 'Admin']
     
     def has_object_permission(self, request, view, obj):
@@ -51,9 +56,17 @@ class CanManageUniformAssignment(permissions.BasePermission):
         if request.user.role == 'Admin':
             return True
         # School admin can only manage assignments for their school
-        return (request.user.role == 'School_Admin' and 
-                hasattr(request.user, 'school_admin_profile') and
-                obj.school == request.user.school_admin_profile.school)
+        if request.user.role == 'School_Admin':
+            return (hasattr(request.user, 'school_admin_profile') and
+                    obj.school == request.user.school_admin_profile.school)
+        # Tailor can view their assignments
+        if request.user.role == 'Tailor' and request.method in permissions.SAFE_METHODS:
+            return hasattr(request.user, 'tailor_profile') and obj.tailor == request.user.tailor_profile
+        # Parent can view their assignments
+        if request.user.role == 'Parent' and request.method in permissions.SAFE_METHODS:
+            return (hasattr(request.user, 'parent_profile') and 
+                    obj.uniform_order.parent == request.user.parent_profile)
+        return False
 
 
 class CanUpdateAssignmentStatus(permissions.BasePermission):

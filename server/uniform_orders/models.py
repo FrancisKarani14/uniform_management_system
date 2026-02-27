@@ -31,9 +31,18 @@ class Uniform_order(models.Model):
 
 #  uniform assignments
 class Uniform_assignment(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('received', 'Received'),
+        ('started', 'Started'),
+        ('halfway', 'Halfway Done'),
+        ('complete', 'Complete'),
+    ]
+    
     uniform_order = models.ForeignKey(Uniform_order, on_delete=models.CASCADE, related_name='uniform_assignment')
     tailor = models.ForeignKey('users.TailorProfile', on_delete=models.CASCADE, related_name='uniform_assignment')
     school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='uniform_assignment')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

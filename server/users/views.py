@@ -122,3 +122,11 @@ class StudentProfileViewSet(viewsets.ModelViewSet):
     queryset = StudentProfile.objects.all()
     serializer_class = StudentProfileSerializer
     permission_classes = [IsSystemAdmin | IsParent | IsStudent]
+    
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'Parent' and hasattr(user, 'parent_profile'):
+            return StudentProfile.objects.filter(parent=user.parent_profile)
+        elif user.role == 'Student' and hasattr(user, 'student_profile'):
+            return StudentProfile.objects.filter(id=user.student_profile.id)
+        return StudentProfile.objects.all()

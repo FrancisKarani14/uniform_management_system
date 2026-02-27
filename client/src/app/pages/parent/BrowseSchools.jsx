@@ -50,7 +50,7 @@ export default function BrowseSchools() {
   };
 
   const getApplicationStatus = (schoolId) => {
-    const app = applications.find(a => a.school?.id === schoolId);
+    const app = applications.find(a => a.school === schoolId || a.school_details?.id === schoolId);
     return app ? app.status : null;
   };
 
@@ -151,7 +151,7 @@ export default function BrowseSchools() {
                 <option value="">-- Select a student --</option>
                 {students.map((student) => (
                   <option key={student.id} value={student.id}>
-                    {student.user?.first_name} {student.user?.last_name} ({student.admission_number})
+                    {student.first_name || student.user?.first_name} {student.last_name || student.user?.last_name} ({student.admission_number})
                   </option>
                 ))}
               </select>

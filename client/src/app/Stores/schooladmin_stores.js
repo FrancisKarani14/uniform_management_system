@@ -97,15 +97,18 @@ export const useSchoolAdminStore = create((set) => ({
   approveParentApplication: async (applicationId) => {
     set({ loading: true, error: null });
     try {
+      console.log('Approving application:', applicationId);
       const response = await API.post(`/schools/parent_school_applications/${applicationId}/approve/`);
+      console.log('Approve response:', response.data);
       set((state) => ({
         parentApplications: state.parentApplications.map(app => 
-          app.id === applicationId ? { ...app, status: 'Approved' } : app
+          app.id === applicationId ? { ...app, status: response.data.application?.status || 'Approved' } : app
         ),
         loading: false
       }));
       return response.data;
     } catch (error) {
+      console.error('Approve error:', error.response?.data || error.message);
       set({ error: error.message, loading: false });
       throw error;
     }
@@ -114,15 +117,18 @@ export const useSchoolAdminStore = create((set) => ({
   rejectParentApplication: async (applicationId) => {
     set({ loading: true, error: null });
     try {
+      console.log('Rejecting application:', applicationId);
       const response = await API.post(`/schools/parent_school_applications/${applicationId}/reject/`);
+      console.log('Reject response:', response.data);
       set((state) => ({
         parentApplications: state.parentApplications.map(app => 
-          app.id === applicationId ? { ...app, status: 'Rejected' } : app
+          app.id === applicationId ? { ...app, status: response.data.application?.status || 'Rejected' } : app
         ),
         loading: false
       }));
       return response.data;
     } catch (error) {
+      console.error('Reject error:', error.response?.data || error.message);
       set({ error: error.message, loading: false });
       throw error;
     }

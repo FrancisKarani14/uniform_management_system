@@ -1,9 +1,16 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
-import { AiOutlineHome, AiOutlineSearch, AiOutlineBank, AiOutlineScissor } from 'react-icons/ai';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { AiOutlineHome, AiOutlineSearch, AiOutlineBank, AiOutlineScissor, AiOutlineUser } from 'react-icons/ai';
 import { FaGraduationCap } from 'react-icons/fa';
 
 export default function TailorDashboard() {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    navigate('/login');
+  };
 
   const isActive = (path) => {
     if (path === '/tailor-dashboard' && location.pathname === '/tailor-dashboard') return true;
@@ -23,7 +30,10 @@ export default function TailorDashboard() {
             </Link>
             <div className="flex items-center gap-4">
               <span className="text-gray-700 font-bold">Mike Tailor</span>
-              <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all">
+              <button 
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all"
+              >
                 Logout
               </button>
             </div>

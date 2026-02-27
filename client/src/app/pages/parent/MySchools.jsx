@@ -12,7 +12,7 @@ export default function MySchools() {
   }, [fetchApplications, fetchStudents]);
 
   const approvedSchools = applications.filter(app => app.status?.toUpperCase() === 'APPROVED');
-  const uniqueSchools = [...new Map(approvedSchools.map(app => [app.school?.id, app.school])).values()].filter(Boolean);
+  const uniqueSchools = [...new Map(approvedSchools.map(app => [app.school_details?.id || app.school, app.school_details])).values()].filter(Boolean);
 
   const [showModal, setShowModal] = useState(false);
   const [selectedSchool, setSelectedSchool] = useState(null);
@@ -32,11 +32,21 @@ export default function MySchools() {
   };
 
   const handleEnroll = async () => {
-    // TODO: Implement enroll student API call
-    alert(`Enrolled ${selectedChildren.length} child(ren) to ${selectedSchool.name}`);
-    setShowModal(false);
-    setSelectedChildren([]);
-    setSelectedSchool(null);
+    try {
+      const updatePromises = selectedChildren.map(childId => 
+        API.patch(`/users/student_profiles/${childId}/`, {
+          school: selectedSchool.id
+        })
+      );
+      await Promise.all(updatePromises);
+      await fetchStudents();
+      setShowModal(false);
+      setSelectedChildren([]);
+      setSelectedSchool(null);
+    } catch (error) {
+      console.error('Failed to enroll students:', error);
+      alert('Failed to enroll students. Please try again.');
+    }
   };
 
   const getStudentCountForSchool = (schoolId) => {
@@ -96,7 +106,7 @@ export default function MySchools() {
                     className="w-4 h-4 text-blue-700 rounded focus:ring-2 focus:ring-blue-700"
                   />
                   <div className="ml-3">
-                    <p className="font-medium text-gray-900">{child.user?.first_name} {child.user?.last_name}</p>
+                    <p className="font-medium text-gray-900">{child.first_name || child.user?.first_name} {child.last_name || child.user?.last_name}</p>
                     <p className="text-sm text-gray-600">{child.admission_number} • {child.gender}</p>
                   </div>
                 </label>

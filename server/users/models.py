@@ -87,12 +87,14 @@ class StudentProfile(models.Model):
         FEMALE = 'Female'
         OTHER = 'Other'
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile', null=True, blank=True)
     parent = models.ForeignKey(ParentProfile, on_delete=models.CASCADE, related_name='children')
     school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='students', null=True, blank=True)
+    first_name = models.CharField(max_length=150, default='Student')
+    last_name = models.CharField(max_length=150, default='Name')
     admission_number = models.CharField(max_length=50, unique=True)
     gender = models.CharField(max_length=10, choices=Gender.choices)
     
 
     def __str__(self):
-        return f"Student: {self.user.username}"
+        return f"Student: {self.first_name} {self.last_name}"

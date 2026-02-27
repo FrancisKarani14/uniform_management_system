@@ -1,18 +1,24 @@
 import { useState, useEffect } from 'react';
 import { useSchoolAdminStore } from '../../Stores/schooladmin_stores';
+import API from '../../Api/Api';
 
 export default function TailorApplications() {
-  const { tailorApplications, fetchTailorApplications, updateTailorApplicationStatus } = useSchoolAdminStore();
+  const { tailorApplications, fetchTailorApplications } = useSchoolAdminStore();
   
   useEffect(() => {
     fetchTailorApplications();
   }, [fetchTailorApplications]);
 
   const handleAction = async (id, action) => {
+    if (!confirm(`Are you sure you want to ${action.toLowerCase()} this application?`)) return;
+    
     try {
-      await updateTailorApplicationStatus(id, action);
+      await API.patch(`/tailors/tailor_school_requests/${id}/`, { status: action });
+      alert('Application updated successfully');
+      await fetchTailorApplications();
     } catch (error) {
-      console.error('Failed to update application:', error);
+      console.error('Error:', error);
+      alert(error.response?.data?.error || error.response?.data?.detail || 'Failed to update application');
     }
   };
 
@@ -48,9 +54,9 @@ export default function TailorApplications() {
           <tbody className="divide-y divide-gray-200">
             {tailorApplications.map((app) => (
               <tr key={app.id}>
-                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.tailor?.shop_name || 'N/A'}</td>
-                <td className="px-6 py-4 text-sm text-gray-600 font-bold">{app.tailor?.user?.email || 'N/A'}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{app.tailor?.location || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.tailor_details?.shop_name || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{app.tailor_details?.email || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{app.tailor_details?.location || 'N/A'}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{new Date(app.applied_at).toLocaleDateString()}</td>
                 <td className="px-6 py-4 text-sm">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(app.status)}`}>
