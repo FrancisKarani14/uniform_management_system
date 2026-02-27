@@ -9,26 +9,31 @@ class School_modelSerializer(serializers.ModelSerializer):
 
 # serialize Parent_school_application
 class Parent_school_application_modelSerializer(serializers.ModelSerializer):
-    parent = serializers.SerializerMethodField()
-    school = serializers.SerializerMethodField()
-    student = serializers.SerializerMethodField()
+    parent_details = serializers.SerializerMethodField(read_only=True)
+    school_details = serializers.SerializerMethodField(read_only=True)
+    student_details = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = Parent_school_application
-        fields = '__all__'
+        fields = ['id', 'parent', 'school', 'student', 'status', 'created_at', 'updated_at', 'parent_details', 'school_details', 'student_details']
         read_only_fields = ['status', 'created_at', 'updated_at']
     
-    def get_parent(self, obj):
+    def get_parent_details(self, obj):
         if obj.parent:
             return {'id': obj.parent.id, 'user': {'email': obj.parent.user.email}}
         return None
     
-    def get_school(self, obj):
+    def get_school_details(self, obj):
         if obj.school:
             return {'id': obj.school.id, 'name': obj.school.name, 'location': obj.school.location}
         return None
     
-    def get_student(self, obj):
+    def get_student_details(self, obj):
         if obj.student:
-            return {'id': obj.student.id, 'admission_number': obj.student.admission_number}
+            return {
+                'id': obj.student.id, 
+                'first_name': obj.student.first_name,
+                'last_name': obj.student.last_name,
+                'admission_number': obj.student.admission_number
+            }
         return None

@@ -118,7 +118,10 @@ class StudentProfileSerializer(serializers.ModelSerializer):
                 'first_name': obj.user.first_name,
                 'last_name': obj.user.last_name
             }
-        return None
+        return {
+            'first_name': obj.first_name,
+            'last_name': obj.last_name
+        }
     
     def get_school(self, obj):
         if obj.school:

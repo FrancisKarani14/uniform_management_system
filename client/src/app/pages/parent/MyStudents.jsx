@@ -14,7 +14,6 @@ export default function MyStudents() {
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
-    admission_number: '',
     gender: ''
   });
   const [error, setError] = useState('');
@@ -27,33 +26,29 @@ export default function MyStudents() {
       const response = await API.get('/users/users/me/');
       const parentProfileId = response.data.parent_profile.id;
       
-      // Generate email from name and admission number
-      const email = `${formData.first_name.toLowerCase()}.${formData.last_name.toLowerCase()}.${formData.admission_number}@student.com`;
+      const timestamp = Date.now();
+      const admissionNumber = `STU${timestamp}`;
       
-      // Create user account for student
-      const userResponse = await API.post('/users/users/', {
-        email: email,
+      await API.post('/users/student_profiles/', {
+        parent: parentProfileId,
         first_name: formData.first_name,
         last_name: formData.last_name,
-        password: formData.admission_number,
-        role: 'Student'
-      });
-      
-      // Create student profile
-      await API.post('/users/student_profiles/', {
-        user: userResponse.data.id,
-        parent: parentProfileId,
+        admission_number: admissionNumber,
+        gender: formData.gender,
         school: null,
-        admission_number: formData.admission_number,
-        gender: formData.gender
+        user: null
       });
       
       setShowModal(false);
-      setFormData({ first_name: '', last_name: '', admission_number: '', gender: '' });
-      fetchStudents();
+      setFormData({ first_name: '', last_name: '', gender: '' });
+      await fetchStudents();
     } catch (error) {
       console.error('Failed to add student:', error);
-      setError(error.response?.data?.admission_number?.[0] || 'Failed to add student');
+      const errorMsg = error.response?.data?.email?.[0]
+        || error.response?.data?.detail
+        || error.response?.data?.message
+        || 'Failed to add student';
+      setError(errorMsg);
     }
   };
 
@@ -73,10 +68,10 @@ export default function MyStudents() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {students.map((student) => (
             <div key={student.id} className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{student.user?.first_name} {student.user?.last_name}</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{student.first_name || student.user?.first_name} {student.last_name || student.user?.last_name}</h3>
               <p className="text-gray-600 mb-1">{student.school?.name || 'Not Enrolled'}</p>
-              <p className="text-gray-500 text-sm">{student.admission_number}</p>
-              <p className="text-gray-500 text-sm">{student.gender}</p>
+              <p className="text-gray-500 text-sm">Admission: {student.admission_number}</p>
+              <p className="text-gray-500 text-sm">Gender: {student.gender}</p>
               <button className="mt-4 w-full py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition-all">
                 View Details
               </button>
@@ -128,16 +123,7 @@ export default function MyStudents() {
                   required
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Admission Number *</label>
-                <input
-                  type="text"
-                  value={formData.admission_number}
-                  onChange={(e) => setFormData({ ...formData, admission_number: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-700"
-                  required
-                />
-              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Gender *</label>
                 <select
