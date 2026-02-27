@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSchoolAdminStore } from '../../Stores/schooladmin_stores';
+import API from '../../Api/Api';
 
 export default function ParentApplications() {
   const { parentApplications, fetchParentApplications, approveParentApplication, rejectParentApplication } = useSchoolAdminStore();
@@ -9,14 +10,19 @@ export default function ParentApplications() {
   }, [fetchParentApplications]);
 
   const handleAction = async (id, action) => {
+    if (!confirm(`Are you sure you want to ${action.toLowerCase()} this application?`)) return;
+    
     try {
-      if (action === 'APPROVED') {
-        await approveParentApplication(id);
-      } else if (action === 'REJECTED') {
-        await rejectParentApplication(id);
-      }
+      const endpoint = action === 'APPROVED' ? 'approve' : 'reject';
+      const response = await API.post(`/schools/parent_school_applications/${id}/${endpoint}/`);
+      console.log('Success response:', response.data);
+      alert(response.data.message || 'Application updated successfully');
+      await fetchParentApplications();
     } catch (error) {
-      console.error('Failed to update application:', error);
+      console.error('Error details:', error);
+      console.error('Error response:', error.response);
+      const errorMsg = error.response?.data?.error || error.response?.data?.detail || error.message || 'Failed to update application';
+      alert('Error: ' + errorMsg);
     }
   };
 

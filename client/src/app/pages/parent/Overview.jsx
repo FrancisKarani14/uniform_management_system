@@ -14,7 +14,7 @@ export default function Overview() {
 
   const stats = {
     uniformApplications: applications.length,
-    approvedSchools: applications.filter(app => app.status === 'APPROVED').length,
+    approvedSchools: applications.filter(app => app.status?.toUpperCase() === 'APPROVED').length,
     myStudents: students.length
   };
 

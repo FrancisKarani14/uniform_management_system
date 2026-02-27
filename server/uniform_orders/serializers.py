@@ -3,19 +3,24 @@ from .models import Uniform_order, Uniform_assignment
 
 # serialize Uniform_order model
 class Uniform_orderSerializer(serializers.ModelSerializer):
-    parent = serializers.SerializerMethodField()
-    school = serializers.SerializerMethodField()
+    parent_details = serializers.SerializerMethodField(read_only=True)
+    school_details = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = Uniform_order
-        fields = '__all__'
+        fields = ['id', 'parent', 'school', 'status', 'gender', 'blouse_size', 'skirt_size', 'sweater_size', 'trouser_size', 'shoes_size', 'shirt_size', 'created_at', 'updated_at', 'parent_details', 'school_details']
+        read_only_fields = ['created_at', 'updated_at']
     
-    def get_parent(self, obj):
-        if obj.parent:
-            return {'id': obj.parent.id, 'user': {'email': obj.parent.user.email}}
+    def get_parent_details(self, obj):
+        if obj.parent and obj.parent.user:
+            return {
+                'id': obj.parent.id, 
+                'name': f"{obj.parent.user.first_name} {obj.parent.user.last_name}",
+                'user': {'email': obj.parent.user.email}
+            }
         return None
     
-    def get_school(self, obj):
+    def get_school_details(self, obj):
         if obj.school:
             return {'id': obj.school.id, 'name': obj.school.name}
         return None

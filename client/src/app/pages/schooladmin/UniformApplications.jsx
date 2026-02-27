@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSchoolAdminStore } from '../../Stores/schooladmin_stores';
 import { useTailorStore } from '../../Stores/tailor_stores';
+import API from '../../Api/Api';
 
 export default function UniformApplications() {
   const { orders, fetchOrders, updateOrderStatus, createAssignment } = useSchoolAdminStore();
@@ -19,11 +20,20 @@ export default function UniformApplications() {
   const [selectedTailor, setSelectedTailor] = useState('');
 
   const handleAction = async (id, action) => {
+    if (!confirm(`Are you sure you want to ${action.toLowerCase()} this application?`)) return;
+    
     try {
-      await updateOrderStatus(id, action.toUpperCase());
+      console.log('Updating order:', id, 'to status:', action.toUpperCase());
+      const response = await API.patch(`/uniform_orders/uniform_orders/${id}/`, { status: action.toUpperCase() });
+      console.log('Update response:', response.data);
+      alert('Application updated successfully');
+      await fetchOrders();
       setShowDetails(false);
     } catch (error) {
-      console.error('Failed to update order:', error);
+      console.error('Full error:', error);
+      console.error('Error response:', error.response);
+      const errorMsg = error.response?.data?.error || error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message || 'Failed to update application';
+      alert('Error: ' + errorMsg);
     }
   };
 
@@ -70,7 +80,7 @@ export default function UniformApplications() {
           <tbody className="divide-y divide-gray-200">
             {orders.map((app) => (
               <tr key={app.id}>
-                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.parent?.user?.email || 'N/A'}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 font-bold">{app.parent_details?.name || 'N/A'}</td>
                 <td className="px-6 py-4 text-sm">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(app.status)}`}>
                     {getStatusLabel(app.status)}
@@ -112,7 +122,7 @@ export default function UniformApplications() {
           <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl border border-gray-200">
             <h3 className="text-2xl font-bold mb-6 text-gray-900">Application Details</h3>
             <div className="space-y-3 mb-6">
-              <div><span className="font-bold">Parent:</span> {selectedApp.parent?.user?.email || 'N/A'}</div>
+              <div><span className="font-bold">Parent:</span> {selectedApp.parent_details?.name || 'N/A'}</div>
               <div><span className="font-bold">Gender:</span> {selectedApp.gender}</div>
               <div><span className="font-bold">Shirt Size:</span> {selectedApp.shirt_size}</div>
               <div><span className="font-bold">Trouser Size:</span> {selectedApp.trouser_size}</div>
@@ -154,7 +164,7 @@ export default function UniformApplications() {
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl border border-gray-200">
             <h3 className="text-2xl font-bold mb-6 text-gray-900">Assign Tailor</h3>
-            <p className="mb-4">Assign uniform application for <strong>{selectedApp.parent?.user?.email}</strong> to a tailor:</p>
+            <p className="mb-4">Assign uniform application for <strong>{selectedApp.parent_details?.name}</strong> to a tailor:</p>
             <select
               value={selectedTailor}
               onChange={(e) => setSelectedTailor(e.target.value)}
