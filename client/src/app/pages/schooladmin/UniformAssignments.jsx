@@ -11,11 +11,25 @@ export default function UniformAssignments() {
   }, [fetchAssignments]);
 
   const getStatusColor = (status) => {
-    return status === 'complete' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800';
+    const badges = {
+      pending: 'bg-yellow-100 text-yellow-700',
+      received: 'bg-blue-100 text-blue-700',
+      started: 'bg-purple-100 text-purple-700',
+      halfway: 'bg-orange-100 text-orange-700',
+      complete: 'bg-green-100 text-green-700'
+    };
+    return badges[status] || 'bg-gray-100 text-gray-700';
   };
 
   const getStatusLabel = (status) => {
-    return status === 'complete' ? 'Complete' : 'In Progress';
+    const labels = {
+      pending: 'Pending',
+      received: 'Received',
+      started: 'Started',
+      halfway: 'Halfway Done',
+      complete: 'Complete'
+    };
+    return labels[status] || 'Unknown';
   };
 
   return (
@@ -42,8 +56,8 @@ export default function UniformAssignments() {
                 <td className="px-6 py-4 text-sm text-gray-600 font-bold">{assignment.tailor_details?.shop_name || '-'}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{new Date(assignment.created_at).toLocaleDateString()}</td>
                 <td className="px-6 py-4 text-sm">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(assignment.status)}`}>
-                    {getStatusLabel(assignment.status)}
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(assignment.status || 'pending')}`}>
+                    {getStatusLabel(assignment.status || 'pending')}
                   </span>
                 </td>
               </tr>
