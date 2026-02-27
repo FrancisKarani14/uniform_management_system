@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTailorStore } from '../../Stores/tailor_stores';
+import API from '../../Api/Api';
 
 export default function TailorBrowseSchools() {
   const { schools, applications, fetchSchools, fetchApplications, applyToSchool } = useTailorStore();
@@ -25,12 +26,19 @@ export default function TailorBrowseSchools() {
 
   const submitApplication = async () => {
     try {
-      await applyToSchool({ school: selectedSchool.id });
+      const response = await API.get('/users/users/me/');
+      const tailorProfileId = response.data.tailor_profile.id;
+      
+      await applyToSchool({ 
+        tailor: tailorProfileId,
+        school: selectedSchool.id 
+      });
       setShowApplyModal(false);
       setSelectedSchool(null);
       setAddress('');
     } catch (error) {
       console.error('Failed to apply:', error);
+      alert(error.response?.data?.detail || 'Failed to apply to school');
     }
   };
 
