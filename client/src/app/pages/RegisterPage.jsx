@@ -45,7 +45,7 @@ export default function RegisterPage() {
 
       if (signUpError) throw signUpError;
 
-      setSuccess('Check your email to complete signup!');
+      setSuccess('Magic link sent! Check your email and click the link to complete signup.');
       setShowEmailModal(false);
       setEmail('');
     } catch (error) {
