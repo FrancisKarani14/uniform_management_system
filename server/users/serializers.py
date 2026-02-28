@@ -32,10 +32,19 @@ class UserSerializer(serializers.ModelSerializer):
     parent_profile = serializers.SerializerMethodField()
     tailor_profile = serializers.SerializerMethodField()
     admin_profile = serializers.SerializerMethodField()
+    password = serializers.CharField(write_only=True)
     
     class Meta:
         model = User
         fields = '__all__'
+    
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        user = User(**validated_data)
+        if password:
+            user.set_password(password)
+        user.save()
+        return user
     
     def get_school_admin_profile(self, obj):
         if hasattr(obj, 'school_admin_profile'):

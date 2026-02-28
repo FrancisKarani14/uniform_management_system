@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import API from '../Api/Api';
+import { supabase } from '../Api/supabase';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -25,24 +25,58 @@ export default function RegisterPage() {
     setShowEmailModal(true);
   };
 
-  const handleSendMagicLink = (e) => {
+  const handleSendMagicLink = async (e) => {
     e.preventDefault();
     if (!validateEmail(email)) {
       setError('Invalid email format');
       return;
     }
     setError('');
-    setSuccess('Magic link sent to your email!');
-    setShowEmailModal(false);
+    
+    try {
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password: Math.random().toString(36).slice(-8), // Random password for magic link users
+        options: {
+          data: { role },
+          emailRedirectTo: window.location.origin + '/auth/callback'
+        }
+      });
+
+      if (signUpError) throw signUpError;
+
+      setSuccess('Magic link sent! Check your email and click the link to complete signup.');
+      setShowEmailModal(false);
+      setEmail('');
+    } catch (error) {
+      console.error('Signup error:', error);
+      setError(error.message || 'Failed to send magic link');
+    }
   };
 
-  const handleGoogleSignup = () => {
+  const handleGoogleSignup = async () => {
     if (!role) {
       setError('Please select your role first');
       return;
     }
     setError('');
-    setSuccess('Redirecting to Google...');
+    
+    try {
+      // Store role in localStorage before OAuth redirect
+      localStorage.setItem('pending_role', role);
+      
+      const { error: googleError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/auth/callback'
+        }
+      });
+
+      if (googleError) throw googleError;
+    } catch (error) {
+      console.error('Google signup error:', error);
+      setError(error.message || 'Failed to signup with Google');
+    }
   };
 
   return (

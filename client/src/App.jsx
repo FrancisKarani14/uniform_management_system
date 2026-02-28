@@ -30,6 +30,7 @@ import TailorBrowseSchools from './app/pages/tailor/TailorBrowseSchools';
 import TailorMySchools from './app/pages/tailor/TailorMySchools';
 import TailorMyAssignments from './app/pages/tailor/TailorMyAssignments';
 import TailorProfile from './app/pages/tailor/TailorProfile';
+import AuthCallback from './app/pages/AuthCallback';
 
 export default function App() {
   return (
@@ -39,6 +40,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<RegisterPage />} />
         <Route path="/complete-profile" element={<CompleteProfilePage />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/parent-dashboard" element={<ParentDashboard />}>
           <Route index element={<Overview />} />
           <Route path="browse-schools" element={<BrowseSchools />} />
