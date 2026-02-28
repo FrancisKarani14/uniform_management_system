@@ -62,11 +62,13 @@ export default function RegisterPage() {
     setError('');
     
     try {
+      // Store role in localStorage before OAuth redirect
+      localStorage.setItem('pending_role', role);
+      
       const { error: googleError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin + '/auth/callback',
-          data: { role }
+          redirectTo: window.location.origin + '/auth/callback'
         }
       });
 

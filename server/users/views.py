@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from .models import User, AdminProfile, TailorProfile, SchoolAdminProfile, ParentProfile, StudentProfile
 from .serializers import UserSerializer, TailorProfileSerializer, ParentProfileSerializer, SchoolAdminProfileSerializer, StudentProfileSerializer, AdminProfileSerializer  
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
 # from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .serializers import CustomTokenSerializer
 from .permissions import IsSystemAdmin, IsTailor, IsParent, IsSchoolAdmin, IsStudent 
@@ -15,6 +16,70 @@ from .permissions import IsSystemAdmin, IsTailor, IsParent, IsSchoolAdmin, IsStu
 
 class CustomTokenView(TokenObtainPairView):
     serializer_class = CustomTokenSerializer
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def supabase_auth(request):
+    """
+    Authenticate user with Supabase token and return Django JWT.
+    POST /api/users/auth/supabase/
+    Body: { "email": "...", "user_metadata": {...} }
+    """
+    print("=== SUPABASE AUTH ENDPOINT HIT ===")
+    print(f"Request data: {request.data}")
+    
+    try:
+        email = request.data.get('email')
+        user_metadata = request.data.get('user_metadata', {})
+        role = request.data.get('role', 'parent').lower()
+        
+        # Map frontend role to backend role
+        role_mapping = {
+            'parent': 'Parent',
+            'tailor': 'Tailor'
+        }
+        user_role = role_mapping.get(role, 'Parent')
+        
+        print(f"Email: {email}")
+        print(f"User metadata: {user_metadata}")
+        print(f"Role: {user_role}")
+        
+        if not email:
+            return Response({'error': 'email required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        print("Creating/getting user...")
+        # Get or create Django user
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={'role': user_role}
+        )
+        print(f"User created: {created}, User: {user}")
+        
+        # Update name if provided and user was just created
+        if created and user_metadata.get('full_name'):
+            name_parts = user_metadata.get('full_name', '').split()
+            user.first_name = name_parts[0] if name_parts else ''
+            user.last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
+            user.save()
+            print(f"Updated user name: {user.first_name} {user.last_name}")
+        
+        print("Generating JWT...")
+        # Generate Django JWT
+        refresh = RefreshToken.for_user(user)
+        
+        print("Success! Returning response")
+        return Response({
+            'token': str(refresh.access_token),
+            'refresh': str(refresh),
+            'user': UserSerializer(user).data
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        import traceback
+        print("=== ERROR ===")
+        print(traceback.format_exc())
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # Create your views here.
 # user viewset
