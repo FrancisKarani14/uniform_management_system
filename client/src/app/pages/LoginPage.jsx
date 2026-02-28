@@ -2,12 +2,11 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { useAuthStore } from '../Stores/auth_store';
+import { supabase } from '../Api/supabase';
 import API from '../Api/Api';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -36,50 +35,65 @@ export default function LoginPage() {
     }
 
     try {
-      await login(email, password);
-      const userResponse = await API.get('/users/users/me/');
-      const userData = userResponse.data;
-      
-      // Check if profile exists
-      const hasProfile = (
-        (userData.role === 'Parent' && userData.parent_profile) ||
-        (userData.role === 'Tailor' && userData.tailor_profile) ||
-        (userData.role === 'School_Admin' && userData.school_admin_profile) ||
-        (userData.role === 'Admin' && userData.admin_profile)
-      );
-      
-      if (!hasProfile) {
-        navigate('/complete-profile');
-        return;
-      }
-      
-      const roleRoutes = {
-        'Admin': '/admin-dashboard',
-        'Parent': '/parent-dashboard',
-        'School_Admin': '/school-admin-dashboard',
-        'Tailor': '/tailor-dashboard'
-      };
-      
-      navigate(roleRoutes[userData.role] || '/parent-dashboard');
+      // Staff only - email/password login
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (signInError) throw signInError;
+
+      // Redirect to callback for role-based routing
+      navigate('/auth/callback');
     } catch (error) {
-      setError(error.response?.data?.detail || 'Login failed. Please check your credentials.');
+      console.error('Login error:', error);
+      setError(error.message || 'Login failed. Please check your credentials.');
     }
   };
 
-  const handleMagicLink = (e) => {
+  const handleMagicLink = async (e) => {
     e.preventDefault();
     if (!validateEmail(magicLinkEmail)) {
       setError('Invalid email format');
       return;
     }
     setError('');
-    setSuccess('Magic link sent to your email!');
-    setShowMagicLinkModal(false);
+    
+    try {
+      const { error: magicLinkError } = await supabase.auth.signInWithOtp({
+        email: magicLinkEmail,
+        options: {
+          emailRedirectTo: window.location.origin + '/auth/callback'
+        }
+      });
+
+      if (magicLinkError) throw magicLinkError;
+
+      setSuccess('Magic link sent to your email!');
+      setShowMagicLinkModal(false);
+      setMagicLinkEmail('');
+    } catch (error) {
+      console.error('Magic link error:', error);
+      setError(error.message || 'Failed to send magic link');
+    }
   };
 
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = async () => {
     setError('');
-    setSuccess('Redirecting to Google...');
+    
+    try {
+      const { error: googleError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/auth/callback'
+        }
+      });
+
+      if (googleError) throw googleError;
+    } catch (error) {
+      console.error('Google login error:', error);
+      setError(error.message || 'Failed to login with Google');
+    }
   };
 
   return (

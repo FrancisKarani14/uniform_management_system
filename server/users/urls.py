@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import UserViewSet, AdminProfileViewSet, TailorProfileViewSet, ParentProfileViewSet, SchoolAdminProfileViewSet, StudentProfileViewSet, CustomTokenView
+from .views import UserViewSet, AdminProfileViewSet, TailorProfileViewSet, ParentProfileViewSet, SchoolAdminProfileViewSet, StudentProfileViewSet, CustomTokenView, supabase_auth
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -13,4 +13,5 @@ router.register(r'student_profiles', StudentProfileViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('token/', CustomTokenView.as_view(), name='token'),
+    path('auth/supabase/', supabase_auth, name='supabase_auth'),
 ]
