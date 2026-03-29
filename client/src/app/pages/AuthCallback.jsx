@@ -26,6 +26,10 @@ export default function AuthCallback() {
         // Clear pending role
         localStorage.removeItem('pending_role');
 
+        // Clear any stale tokens before getting new ones
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+
         // Send user data to Django backend
         const response = await API.post('/users/auth/supabase/', {
           email: session.user.email,
