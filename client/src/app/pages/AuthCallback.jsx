@@ -40,8 +40,28 @@ export default function AuthCallback() {
         // Store Django token
         localStorage.setItem('access_token', response.data.token);
         localStorage.setItem('refresh_token', response.data.refresh);
-        
-        navigate('/complete-profile');
+
+        const userData = response.data.user;
+        const userRole = userData.role;
+
+        // Check if profile already exists
+        const hasProfile =
+          (userRole === 'Parent' && userData.parent_profile) ||
+          (userRole === 'Tailor' && userData.tailor_profile) ||
+          (userRole === 'Admin' && userData.admin_profile) ||
+          (userRole === 'School_Admin' && userData.school_admin_profile);
+
+        if (hasProfile) {
+          const dashboardMap = {
+            Admin: '/admin-dashboard',
+            Tailor: '/tailor-dashboard',
+            Parent: '/parent-dashboard',
+            School_Admin: '/school-admin-dashboard',
+          };
+          navigate(dashboardMap[userRole] || '/complete-profile');
+        } else {
+          navigate('/complete-profile');
+        }
       } catch (error) {
         console.error('Auth callback error:', error);
         setError('Authentication failed. Redirecting...');
