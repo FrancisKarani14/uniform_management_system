@@ -69,7 +69,7 @@ export default function TailorDashboard() {
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0`}>
           <div className="p-4 mb-2 mt-16 md:mt-0">
-            <h2 className="text-lg font-bold text-gray-900">Tailor Dashboard</h2>
+            <h2 className="text-lg font-bold text-gray-900">{user?.first_name} {user?.last_name}</h2>
           </div>
           <nav className="p-4">
             <ul className="space-y-2">

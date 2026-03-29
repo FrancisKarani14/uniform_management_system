@@ -79,7 +79,7 @@ export default function ParentDashboard() {
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0`}>
           <div className="mb-6 mt-16 md:mt-0">
-            <h2 className="text-lg font-bold text-gray-900">Parent Dashboard</h2>
+            <h2 className="text-lg font-bold text-gray-900">{user?.first_name} {user?.last_name}</h2>
           </div>
           <nav className="space-y-2">
             <NavLink
