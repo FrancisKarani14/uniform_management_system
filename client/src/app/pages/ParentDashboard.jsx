@@ -75,7 +75,7 @@ export default function ParentDashboard() {
           />
         )}
         {/* Sidebar */}
-        <aside className={`fixed md:static z-30 top-0 left-0 h-full w-64 bg-white shadow-md min-h-screen p-6 transform transition-transform duration-300 ${
+        <aside className={`fixed md:static z-30 top-0 left-0 h-full w-64 bg-white shadow-md min-h-screen p-6 overflow-y-auto transform transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0`}>
           <div className="mb-6 mt-16 md:mt-0">
@@ -85,11 +85,10 @@ export default function ParentDashboard() {
             <NavLink
               to="/parent-dashboard"
               end
+              onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
-                  isActive
-                    ? 'bg-blue-700 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                  isActive ? 'bg-blue-700 text-white' : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
@@ -98,11 +97,10 @@ export default function ParentDashboard() {
             </NavLink>
             <NavLink
               to="/parent-dashboard/browse-schools"
+              onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
-                  isActive
-                    ? 'bg-blue-700 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                  isActive ? 'bg-blue-700 text-white' : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
@@ -111,11 +109,10 @@ export default function ParentDashboard() {
             </NavLink>
             <NavLink
               to="/parent-dashboard/my-students"
+              onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
-                  isActive
-                    ? 'bg-blue-700 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                  isActive ? 'bg-blue-700 text-white' : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
@@ -124,11 +121,10 @@ export default function ParentDashboard() {
             </NavLink>
             <NavLink
               to="/parent-dashboard/uniform-applications"
+              onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
-                  isActive
-                    ? 'bg-blue-700 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                  isActive ? 'bg-blue-700 text-white' : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
@@ -137,11 +133,10 @@ export default function ParentDashboard() {
             </NavLink>
             <NavLink
               to="/parent-dashboard/my-schools"
+              onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
-                  isActive
-                    ? 'bg-blue-700 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                  isActive ? 'bg-blue-700 text-white' : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
@@ -153,9 +148,7 @@ export default function ParentDashboard() {
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
-                  isActive
-                    ? 'bg-blue-700 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                  isActive ? 'bg-blue-700 text-white' : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >

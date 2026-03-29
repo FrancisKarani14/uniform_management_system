@@ -13,11 +13,6 @@ export default function TailorDashboard() {
   useEffect(() => {
     API.get('/users/users/me/').then(res => setUser(res.data)).catch(() => navigate('/login'));
   }, [navigate]);
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    API.get('/users/users/me/').then(res => setUser(res.data)).catch(() => navigate('/login'));
-  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
@@ -81,6 +76,7 @@ export default function TailorDashboard() {
               <li>
                 <Link
                   to="/tailor-dashboard"
+                  onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
                     isActive('/tailor-dashboard') && location.pathname === '/tailor-dashboard'
                       ? 'bg-blue-700 text-white'
@@ -94,6 +90,7 @@ export default function TailorDashboard() {
               <li>
                 <Link
                   to="/tailor-dashboard/browse-schools"
+                  onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
                     isActive('/tailor-dashboard/browse-schools')
                       ? 'bg-blue-700 text-white'
@@ -107,6 +104,7 @@ export default function TailorDashboard() {
               <li>
                 <Link
                   to="/tailor-dashboard/my-schools"
+                  onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
                     isActive('/tailor-dashboard/my-schools')
                       ? 'bg-blue-700 text-white'
@@ -120,6 +118,7 @@ export default function TailorDashboard() {
               <li>
                 <Link
                   to="/tailor-dashboard/my-assignments"
+                  onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
                     isActive('/tailor-dashboard/my-assignments')
                       ? 'bg-blue-700 text-white'
@@ -133,6 +132,7 @@ export default function TailorDashboard() {
               <li>
                 <Link
                   to="/tailor-dashboard/profile"
+                  onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
                     isActive('/tailor-dashboard/profile')
                       ? 'bg-blue-700 text-white'

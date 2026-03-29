@@ -61,11 +61,10 @@ export default function SystemAdminDashboard() {
             <NavLink
               to="/admin-dashboard"
               end
+              onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
-                  isActive
-                    ? 'bg-blue-700 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                  isActive ? 'bg-blue-700 text-white' : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
@@ -74,11 +73,10 @@ export default function SystemAdminDashboard() {
             </NavLink>
             <NavLink
               to="/admin-dashboard/user-management"
+              onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
-                  isActive
-                    ? 'bg-blue-700 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                  isActive ? 'bg-blue-700 text-white' : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
@@ -87,11 +85,10 @@ export default function SystemAdminDashboard() {
             </NavLink>
             <NavLink
               to="/admin-dashboard/schools"
+              onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
-                  isActive
-                    ? 'bg-blue-700 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                  isActive ? 'bg-blue-700 text-white' : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
@@ -100,11 +97,10 @@ export default function SystemAdminDashboard() {
             </NavLink>
             <NavLink
               to="/admin-dashboard/profile"
+              onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
-                  isActive
-                    ? 'bg-blue-700 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                  isActive ? 'bg-blue-700 text-white' : 'text-gray-700 hover:bg-gray-100'
                 }`
               }
             >
