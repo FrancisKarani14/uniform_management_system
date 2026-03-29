@@ -32,13 +32,13 @@ export default function LandingPage() {
             />
           ))}
         </div>
-        <div className="absolute w-full h-full bg-white/25"></div>
+        <div className="absolute w-full h-full bg-white/25 md:bg-white/25 bg-black/40"></div>
         <div className="absolute w-full h-full flex items-center px-16 pt-24">
           <div className="max-w-2xl">
-            <h1 className="text-5xl font-bold mb-6 leading-tight text-gray-900">
+            <h1 className="text-5xl font-bold mb-6 leading-tight text-white md:text-gray-900">
               Simplify School Uniform Management
             </h1>
-            <p className="text-xl leading-relaxed mb-8 text-black font-semibold">
+            <p className="text-xl leading-relaxed mb-8 text-white md:text-black font-semibold">
               Connect parents, tailors, and schools in one seamless platform.
               Streamline uniform applications, approvals, and delivery with UniformHub.
             </p>

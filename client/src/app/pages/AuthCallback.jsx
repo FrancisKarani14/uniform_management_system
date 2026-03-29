@@ -10,18 +10,28 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
+        // Exchange the hash fragment tokens with Supabase
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (sessionError) throw sessionError;
-        
+        // If no session yet, wait for Supabase to process the hash
         if (!session) {
+          const { data, error: hashError } = await supabase.auth.refreshSession();
+          if (hashError || !data.session) {
+            navigate('/login');
+            return;
+          }
+        }
+
+        const { data: { session: finalSession } } = await supabase.auth.getSession();
+        
+        if (!finalSession) {
           navigate('/login');
           return;
         }
 
         // Get role from localStorage (set during signup) or user_metadata
         const pendingRole = localStorage.getItem('pending_role');
-        const role = pendingRole || session.user.user_metadata?.role || 'parent';
+        const role = pendingRole || finalSession.user.user_metadata?.role || 'parent';
         
         // Clear pending role
         localStorage.removeItem('pending_role');
@@ -32,8 +42,8 @@ export default function AuthCallback() {
 
         // Send user data to Django backend
         const response = await API.post('/users/auth/supabase/', {
-          email: session.user.email,
-          user_metadata: session.user.user_metadata,
+          email: finalSession.user.email,
+          user_metadata: finalSession.user.user_metadata,
           role: role
         });
 
